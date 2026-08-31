@@ -1,0 +1,25 @@
+{
+  "name": "overseas-smart-scheduling-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve --host 127.0.0.1 --port 4178",
+    "serve:monitor": "vue-cli-service serve --host 127.0.0.1 --port 4181",
+    "preview": "node preview-server.js",
+    "preview:monitor": "node preview-monitor-server.js",
+    "build": "vue-cli-service build",
+    "build:pages": "VUE_APP_PUBLIC_PATH=/intl-attendance-smart-scheduling/ vue-cli-service build"
+  },
+  "dependencies": {
+    "@lui/lui-ui": "2.15.27",
+    "core-js": "^3.8.3",
+    "vue": "2.7.16"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.15",
+    "@vue/cli-service": "~4.5.15",
+    "sass": "^1.32.7",
+    "sass-loader": "^10.1.1",
+    "vue-template-compiler": "2.7.16"
+  }
+}
