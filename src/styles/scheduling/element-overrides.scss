@@ -1,0 +1,450 @@
+/*
+ * Scheduling-only LUI/Element overrides.
+ *
+ * Boundary rules:
+ * 1. Never add a bare `.el-*` or `.v-modal` selector here.
+ * 2. In-tree components must live below `.overseas-schedule-root`.
+ * 3. Body-mounted overlays must be guarded by the scheduling root and/or a
+ *    feature-specific custom class.
+ */
+
+/* Table selection cells inside scheduling pages and their body-mounted forms. */
+.overseas-schedule-root .el-table .el-table-column--selection .el-checkbox__inner,
+.overseas-schedule-root .el-table td.el-table-column--selection .el-checkbox__inner,
+.overseas-schedule-root .el-table th.el-table-column--selection .el-checkbox__inner,
+.overseas-schedule-root .el-table .el-table__cell.is-selection .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-form-drawer__table .el-table-column--selection .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-form-drawer__table .el-table__cell.is-selection .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-add-person-dialog .el-table-column--selection .el-checkbox__inner {
+  border: 1px solid #e4e5e9;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: none;
+}
+
+.overseas-schedule-root .el-table .el-table-column--selection .el-checkbox__input:hover .el-checkbox__inner,
+.overseas-schedule-root .el-table .el-table__cell.is-selection .el-checkbox__input:hover .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-form-drawer__table .el-table-column--selection .el-checkbox__input:hover .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-form-drawer__table .el-table__cell.is-selection .el-checkbox__input:hover .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-add-person-dialog .el-table-column--selection .el-checkbox__input:hover .el-checkbox__inner {
+  border-color: #3c6ef0;
+}
+
+.overseas-schedule-root .el-table .el-table-column--selection .el-checkbox__input.is-checked .el-checkbox__inner,
+.overseas-schedule-root .el-table .el-table-column--selection .el-checkbox__input.is-indeterminate .el-checkbox__inner,
+.overseas-schedule-root .el-table .el-table__cell.is-selection .el-checkbox__input.is-checked .el-checkbox__inner,
+.overseas-schedule-root .el-table .el-table__cell.is-selection .el-checkbox__input.is-indeterminate .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-form-drawer__table .el-table-column--selection .el-checkbox__input.is-checked .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-form-drawer__table .el-table-column--selection .el-checkbox__input.is-indeterminate .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-form-drawer__table .el-table__cell.is-selection .el-checkbox__input.is-checked .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-form-drawer__table .el-table__cell.is-selection .el-checkbox__input.is-indeterminate .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-add-person-dialog .el-table-column--selection .el-checkbox__input.is-checked .el-checkbox__inner,
+body:has(.overseas-schedule-root) .zn-add-person-dialog .el-table-column--selection .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  border-color: #3c6ef0;
+  background-color: #3c6ef0;
+  box-shadow: none;
+}
+
+/* Base dialog treatment only while the scheduling application is mounted. */
+body:has(.overseas-schedule-root) > .v-modal {
+  background: #23252b;
+  opacity: .6;
+}
+
+body:has(.overseas-schedule-root) .el-dialog {
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(35, 37, 43, .1);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+body:has(.overseas-schedule-root) .el-dialog__header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+body:has(.overseas-schedule-root) .el-dialog__title {
+  color: #23252b;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+body:has(.overseas-schedule-root) .el-dialog__headerbtn {
+  top: 16px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
+}
+
+body:has(.overseas-schedule-root) .el-dialog__headerbtn .el-dialog__close {
+  color: #868d9f;
+  font-size: 18px;
+  line-height: 20px;
+}
+
+body:has(.overseas-schedule-root) .el-dialog__headerbtn:hover .el-dialog__close {
+  color: #525765;
+}
+
+body:has(.overseas-schedule-root) .el-dialog__body {
+  padding: 16px 24px;
+  color: #525765;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+body:has(.overseas-schedule-root) .el-dialog__footer {
+  padding: 12px 24px 16px;
+  border-top: 1px solid #eaeaea;
+}
+
+/* 排班 Toast：宽度跟随文案，默认 3 秒消失，按语义使用绿 / 橙 / 红。 */
+body:has(.overseas-schedule-root) .el-message {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: calc(100vw - 32px);
+  min-height: 40px;
+  overflow: hidden;
+  padding: 8px 16px;
+  border-radius: 8px !important;
+  box-shadow: none;
+}
+
+body:has(.overseas-schedule-root) .el-message__content {
+  color: #525765;
+  font-size: 14px;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+body:has(.overseas-schedule-root) .el-message__icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+body:has(.overseas-schedule-root) .el-message--success {
+  border-color: #b7ebd1;
+  background: #e8f8f0;
+}
+
+body:has(.overseas-schedule-root) .el-message--success .el-message__icon {
+  color: #12b35d;
+}
+
+body:has(.overseas-schedule-root) .el-message--warning,
+body:has(.overseas-schedule-root) .el-message--info {
+  border-color: #ffd9b8;
+  background: #fff1e6;
+}
+
+body:has(.overseas-schedule-root) .el-message--warning .el-message__icon,
+body:has(.overseas-schedule-root) .el-message--info .el-message__icon {
+  color: #ff7700;
+}
+
+body:has(.overseas-schedule-root) .el-message--error {
+  border-color: #ffc4c4;
+  background: #ffecec;
+}
+
+/*
+ * Scheduling table scroll integrity.
+ * Keep the viewport border on the scroller itself; never draw it with an
+ * absolutely positioned pseudo element that moves with the scroll content.
+ */
+.overseas-schedule-root .schedule-scroll,
+.overseas-schedule-root .overview-matrix,
+body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  overflow: auto;
+  border: 1px solid #f1f2f4;
+  border-radius: 8px;
+  background: #fff;
+  background-clip: padding-box;
+  isolation: isolate;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+}
+
+.overseas-schedule-root .schedule-scroll::before,
+.overseas-schedule-root .schedule-scroll::after,
+.overseas-schedule-root .overview-matrix::before,
+.overseas-schedule-root .overview-matrix::after,
+body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix::before,
+body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix::after {
+  display: none !important;
+}
+
+/* Main schedule empty state: fill the viewport below the sticky header. */
+.overseas-schedule-root .zn-shift-module .overview-matrix:has(.zn-schedule-empty-row) > table {
+  height: 100% !important;
+}
+
+.overseas-schedule-root .zn-shift-module .overview-matrix:has(.zn-schedule-empty-row) > table > tbody {
+  height: calc(100% - 48px);
+}
+
+.overseas-schedule-root .zn-shift-module .overview-matrix:has(.zn-schedule-empty-row) .zn-schedule-empty-row,
+.overseas-schedule-root .zn-shift-module .overview-matrix:has(.zn-schedule-empty-row) .zn-schedule-empty-cell {
+  height: 100%;
+}
+
+/* Operation help: stable PC3 side navigation and compact shortcut table. */
+body:has(.overseas-schedule-root) .zn-operation-help-dialog .zn-help-split__nav-item {
+  min-height: 48px;
+  padding: 13px 16px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+body:has(.overseas-schedule-root) .zn-operation-help-dialog .zn-help-split__nav-item.is-active::before {
+  top: 0;
+  height: 48px;
+  transform: none;
+}
+
+body:has(.overseas-schedule-root) .zn-operation-shortcuts-table {
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #f1f2f4;
+  border-radius: 8px;
+  background: #fff;
+}
+
+body:has(.overseas-schedule-root) .zn-operation-shortcuts-table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  color: #23252b;
+  font-size: 14px;
+}
+
+body:has(.overseas-schedule-root) .zn-operation-shortcuts-table__key-col {
+  width: 160px;
+}
+
+body:has(.overseas-schedule-root) .zn-operation-shortcuts-table th,
+body:has(.overseas-schedule-root) .zn-operation-shortcuts-table td {
+  box-sizing: border-box;
+  height: 48px;
+  padding: 0 16px;
+  border-right: 1px solid #f1f2f4;
+  border-bottom: 1px solid #f1f2f4;
+  text-align: left;
+  vertical-align: middle;
+}
+
+body:has(.overseas-schedule-root) .zn-operation-shortcuts-table th {
+  background: #f5f5f6;
+  color: #525765;
+  font-weight: 500;
+}
+
+body:has(.overseas-schedule-root) .zn-operation-shortcuts-table tr > :last-child {
+  border-right: 0;
+}
+
+body:has(.overseas-schedule-root) .zn-operation-shortcuts-table tbody tr:last-child > td {
+  border-bottom: 0;
+}
+
+body:has(.overseas-schedule-root) .zn-operation-shortcuts-table tbody tr:hover > td {
+  background: #f5f8ff;
+}
+
+/* Attendance rules use one text hierarchy; category names are not link actions. */
+body:has(.overseas-schedule-root) .zn-operation-help-dialog .zn-help-rule__type {
+  color: #525765;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+/* Shift/rotation tofu contract: normal cards are always 148 × 40. */
+.overseas-schedule-root .overview-legend-block .legend-chip,
+.overseas-schedule-root .domestic-smart-shift-chip,
+.overseas-schedule-root .zn-stat-shift-tag,
+body:has(.overseas-schedule-root) .shift-picker-dialog.is-day .shift-picker-chip,
+body:has(.overseas-schedule-root) .zn-rotation-day-popper .shift-picker-chip,
+body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-option-card {
+  box-sizing: border-box;
+  flex: 0 0 148px !important;
+  width: 148px !important;
+  min-width: 148px !important;
+  max-width: 148px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.overseas-schedule-root .overview-legend-block .legend-chip b,
+.overseas-schedule-root .overview-legend-block .legend-chip small,
+.overseas-schedule-root .domestic-smart-shift-chip b,
+.overseas-schedule-root .domestic-smart-shift-chip small,
+.overseas-schedule-root .zn-stat-shift-tag b,
+.overseas-schedule-root .zn-stat-shift-tag small,
+body:has(.overseas-schedule-root) .shift-picker-dialog.is-day .shift-picker-chip b,
+body:has(.overseas-schedule-root) .shift-picker-dialog.is-day .shift-picker-chip small,
+body:has(.overseas-schedule-root) .zn-rotation-day-popper .shift-picker-chip b,
+body:has(.overseas-schedule-root) .zn-rotation-day-popper .shift-picker-chip small,
+body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-option-card strong,
+body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-option-card span {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Three fixed cards plus checkbox columns and 24px gaps must fit without clipping. */
+body:has(.overseas-schedule-root) .shift-picker-dialog.is-day,
+body:has(.overseas-schedule-root) .zn-rotation-day-popper.el-popover,
+body:has(.overseas-schedule-root) .domestic-smart-cycle-popper.el-select-dropdown {
+  width: min(608px, calc(100vw - 32px)) !important;
+  max-width: calc(100vw - 32px);
+}
+
+body:has(.overseas-schedule-root) .shift-picker-dialog.is-day .shift-picker-grid,
+body:has(.overseas-schedule-root) .zn-rotation-day-popper .zn-rotation-day-picker,
+body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .el-select-dropdown__list {
+  grid-template-columns: repeat(3, 172px);
+  justify-content: start;
+  column-gap: 24px;
+}
+
+/* These two tables use one dedicated inner scroller to avoid nested scrollbars. */
+.overseas-schedule-root .domestic-smart-board.overview-matrix,
+.overseas-schedule-root .domestic-smart-cycle-matrix.overview-matrix {
+  overflow: hidden;
+}
+
+.overseas-schedule-root .domestic-smart-board-scroll,
+.overseas-schedule-root .domestic-smart-cycle-scroll {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+}
+
+/* Element/LUI tables: both axes stay available whenever content exceeds the viewport. */
+.overseas-schedule-root .el-table .el-table__body-wrapper,
+body:has(.overseas-schedule-root) .zn-form-drawer__table .el-table__body-wrapper,
+body:has(.overseas-schedule-root) .zn-confirm-shift-table .el-table__body-wrapper {
+  max-width: 100%;
+  min-width: 0;
+  overflow: auto !important;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+}
+
+/* Opaque sticky cells and a single seam stop moving cells bleeding underneath. */
+.overseas-schedule-root .domestic-smart-board .overview-person-col,
+.overseas-schedule-root .domestic-smart-board .overview-person-cell,
+.overseas-schedule-root .domestic-smart-board .overview-rest-col,
+.overseas-schedule-root .domestic-smart-board .overview-rest-cell,
+.overseas-schedule-root .domestic-smart-cycle-matrix .domestic-smart-cycle-person-col,
+.overseas-schedule-root .domestic-smart-cycle-matrix .domestic-smart-cycle-person-cell,
+.overseas-schedule-root .domestic-smart-cycle-matrix .domestic-smart-cycle-action-col,
+.overseas-schedule-root .domestic-smart-cycle-matrix .domestic-smart-cycle-action-cell,
+body:has(.overseas-schedule-root) .zn-cycle-matrix .overview-operation-col,
+body:has(.overseas-schedule-root) .zn-cycle-matrix .overview-operation-cell {
+  background-clip: padding-box;
+}
+
+.overseas-schedule-root .domestic-smart-board .overview-rest-col,
+.overseas-schedule-root .domestic-smart-board .overview-rest-cell,
+.overseas-schedule-root .domestic-smart-cycle-matrix .domestic-smart-cycle-person-col,
+.overseas-schedule-root .domestic-smart-cycle-matrix .domestic-smart-cycle-person-cell {
+  box-shadow: 1px 0 0 #f1f2f4;
+}
+
+.overseas-schedule-root .domestic-smart-cycle-matrix .domestic-smart-cycle-action-col,
+.overseas-schedule-root .domestic-smart-cycle-matrix .domestic-smart-cycle-action-cell,
+body:has(.overseas-schedule-root) .zn-cycle-matrix .overview-operation-col,
+body:has(.overseas-schedule-root) .zn-cycle-matrix .overview-operation-cell {
+  box-shadow: -1px 0 0 #f1f2f4;
+}
+
+body:has(.overseas-schedule-root) .el-message--error .el-message__icon {
+  color: #fc3737;
+}
+
+/* 新人提示：保持无标题结构，但补足标准提示弹窗的垂直空间。 */
+body:has(.overseas-schedule-root) .zn-newcomer-tip-dialog.el-dialog {
+  display: flex;
+  min-height: 224px;
+  flex-direction: column;
+}
+
+body:has(.overseas-schedule-root) .zn-newcomer-tip-dialog .el-dialog__body {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+}
+
+body:has(.overseas-schedule-root) .zn-newcomer-tip-dialog .zn-newcomer-tip {
+  width: 100%;
+}
+
+body:has(.overseas-schedule-root) .zn-newcomer-tip-dialog .el-dialog__footer {
+  flex: 0 0 56px;
+}
+
+/*
+ * 职能后线发布校验：由整行单一顶层伪元素连续绘制错误描边。
+ * 禁用旧的逐单元格伪元素，避免灰色列分隔线切断红色横线。
+ */
+body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix tbody tr.is-rule-error-row {
+  position: relative;
+  z-index: 5;
+}
+
+body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix tbody tr.is-rule-error-row > td::after {
+  display: none !important;
+  content: none !important;
+}
+
+body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix tbody tr.is-rule-error-row::after {
+  position: absolute;
+  z-index: 40;
+  inset: 0;
+  box-shadow: inset 0 0 0 1px #fc3737;
+  content: '';
+  pointer-events: none;
+}
+
+body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix tbody tr.is-rule-error-row > .overview-operation-cell {
+  position: sticky !important;
+  z-index: 30 !important;
+  right: 0 !important;
+  background: #fff1f0 !important;
+}
+
+body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix tbody tr.is-rule-error-row > .overview-operation-cell::after {
+  position: absolute;
+  z-index: 2;
+  display: block !important;
+  inset: 0;
+  box-shadow: inset -1px 0 0 #fc3737, inset 0 1px 0 #fc3737, inset 0 -1px 0 #fc3737;
+  content: '' !important;
+  pointer-events: none;
+}
+
+body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix tbody tr.is-rule-error-row > .overview-operation-cell .zn-cycle-copy-link {
+  position: relative;
+  z-index: 3;
+}

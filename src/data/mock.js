@@ -1,3 +1,5 @@
+import { decorateShift } from '../utils/shiftPalette'
+
 export const dates = [
   { key: '07-17', week: '周五', label: '07/17' },
   { key: '07-18', week: '周六', label: '07/18' },
@@ -47,15 +49,14 @@ export const forecastRows = [
 ]
 
 export const shifts = [
-  { id: 'REST', name: '休息', time: '00:00-23:59', color: '#A8AEB8', light: '#F0F1F4', isRest: true },
-  { id: 'Z1', name: '早班1次', time: '08:00-20:00', color: '#8BC557', light: '#EEF7E4' },
-  { id: 'Z2', name: '早班2次', time: '08:00-15:00', color: '#02B57D', light: '#E0F6EE' },
-  { id: 'Z3', name: '中班1次', time: '11:00-15:00', color: '#44CEBF', light: '#E6F8F6' },
-  { id: 'Z4', name: '中班2次', time: '23:00-06:00', color: '#C5AC8D', light: '#F6F1EA' },
-  { id: 'Z5', name: '晚班1次', time: '18:00-02:00', color: '#F59A23', light: '#FFF4E5' },
-  { id: 'Z6', name: '早班3次', time: '09:00-18:00', color: '#5B8DEF', light: '#EAF1FF' },
-  { id: 'Z7', name: '早班4次', time: '09:00-18:00', color: '#7BB661', light: '#EEF7E8' },
-  { id: 'Z8', name: '(跳)早班7次', time: '08:00-17:00', color: '#12B35D', light: '#E5F8EE', outlined: true },
+  decorateShift({ id: 'Z1', name: '早班1次', time: '08:00-20:00' }),
+  decorateShift({ id: 'Z2', name: '早班2次', time: '08:00-15:00' }),
+  decorateShift({ id: 'Z6', name: '早班3次', time: '09:00-18:00' }),
+  decorateShift({ id: 'Z7', name: '早班4次', time: '09:00-18:00' }),
+  decorateShift({ id: 'Z3', name: '中班1次', time: '11:00-15:00' }),
+  decorateShift({ id: 'Z4', name: '中班2次', time: '23:00-06:00' }),
+  decorateShift({ id: 'Z5', name: '晚班1次', time: '18:00-02:00' }),
+  decorateShift({ id: 'REST', name: '休息', time: '00:00-23:59', isRest: true }),
 ]
 
 const schedulePattern = [
@@ -75,7 +76,7 @@ const schedulePattern = [
   ['Z4', 'Z4', 'Z4', 'Z4', '休', 'Z4', 'Z4', 'Z4'],
   ['Z6', 'Z6', '休', 'Z6', 'Z6', 'Z7', 'Z7', '休'],
   ['Z1', '休', 'Z2', 'Z2', 'Z2', '休', 'Z1', 'Z1'],
-  ['Z8', 'Z8', 'Z8', '休', 'Z8', 'Z8', '休', 'Z8'],
+  ['Z7', 'Z7', 'Z7', '休', 'Z7', 'Z7', '休', 'Z7'],
   ['Z3', 'Z3', 'Z3', 'Z3', '休', 'Z3', 'Z3', 'Z3'],
 ]
 

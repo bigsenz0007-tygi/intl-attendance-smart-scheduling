@@ -1,5 +1,7 @@
 /* 排班监控中心 — 对齐 Figma 国际用工中心看板 + LUI PC3.0 */
 
+@import '../styles/asset-path';
+
 @font-face {
   font-family: "JDZhengHT";
   src: url("#{$public-path}assets/fonts/JDZhengHT-EN-Regular.ttf") format("truetype");
@@ -163,11 +165,25 @@
   box-shadow: 0 0 0 3px rgba(60, 110, 240, 0.15);
 }
 
+.schedule-monitor-app .monitor-query-item .el-select .el-input__suffix {
+  display: flex;
+  align-items: center;
+  right: 8px;
+  height: 100%;
+}
+
 .schedule-monitor-app .monitor-query-item .el-select .el-select__caret {
-  width: 16px;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  color: #868d9f;
+  font-size: 14px;
+  line-height: 14px;
+  transition: transform 0.2s ease, color 0.2s ease !important;
+}
+
+.schedule-monitor-app .monitor-query-item .el-select:hover .el-select__caret {
   color: #525765;
-  font-size: 16px;
-  transition: none !important;
 }
 
 .schedule-monitor-app .monitor-query-item .el-select .el-input__clear {
@@ -494,14 +510,25 @@
 }
 
 .schedule-monitor-app .monitor-table-wrap {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow: auto;
+  max-height: min(60vh, 560px);
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
   border: 1px solid #e8e8e8;
   border-radius: var(--monitor-radius);
+  background: #fff;
+  isolation: isolate;
 }
 
 .schedule-monitor-app .monitor-table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: 840px;
+  border-collapse: separate;
+  border-spacing: 0;
   table-layout: fixed;
 }
 
@@ -515,8 +542,11 @@
 }
 
 .schedule-monitor-app .monitor-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   color: var(--monitor-text-secondary);
-  background: #fafafb;
+  background: #f5f5f6;
   font-family: var(--font-text);
   font-weight: 500;
 }

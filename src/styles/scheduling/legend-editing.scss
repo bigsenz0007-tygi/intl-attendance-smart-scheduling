@@ -1,0 +1,116 @@
+/* 班次 / 轮班图例编辑与人员异常，仅作用于国内排班功能。 */
+.zn-shift-module .legend-chip--shift,
+.zn-shift-module .legend-chip--rotation {
+  width: max-content;
+  min-width: 0;
+  max-width: 100%;
+  cursor: pointer;
+}
+
+/* 标签换行后仍从首个班次的位置起排，不回到“班次”标题下方。 */
+.zn-shift-module .overview-legend-row .legend {
+  position: relative;
+  padding-left: 40px;
+}
+
+.zn-shift-module .overview-legend-row .legend > strong {
+  position: absolute;
+  top: 9px;
+  left: 0;
+}
+
+.zn-shift-module .legend-chip--rotation {
+  width: 92px;
+  min-width: 92px;
+  max-width: 92px;
+  border: 1px solid #c8d7fb;
+  background: #e6edff;
+  color: #3c6ef0;
+}
+.zn-shift-module .legend-chip--rotation b,
+.zn-shift-module .legend-chip--rotation small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 班表豆腐块随单元格伸缩，四边统一预留 4px。 */
+.zn-shift-module .overview-matrix tbody tr > td.overview-shift-cell {
+  position: relative;
+  padding: 4px;
+}
+
+.zn-shift-module .overview-matrix tbody tr > td.overview-shift-cell > .overview-shift-chip,
+.zn-shift-module .overview-matrix tbody tr > td.overview-shift-cell > .rest-cell {
+  position: static;
+  inset: auto;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0;
+}
+
+.zn-shift-module .overview-matrix.density-normal tbody tr > td.overview-shift-cell > .overview-shift-chip.is-regular {
+  height: 40px !important;
+  min-height: 40px !important;
+}
+
+.zn-rotation-shift-popper.el-select-dropdown { width: 240px; }
+.zn-rotation-shift-popper .el-select-dropdown__list { padding: 8px; }
+.zn-rotation-shift-popper .el-select-dropdown__item { height: auto; min-height: 56px; padding: 4px; line-height: normal; }
+.zn-rotation-shift-popper .el-select-dropdown__item.hover,
+.zn-rotation-shift-popper .el-select-dropdown__item:hover,
+.zn-rotation-shift-popper .el-select-dropdown__item.selected { background: transparent; }
+
+.zn-rotation-option-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 0;
+  max-width: 100%;
+  height: 40px;
+  min-height: 40px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.zn-rotation-option-card strong,
+.zn-rotation-option-card span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.zn-rotation-option-card strong { font-weight: 500; }
+.zn-rotation-shift-popper .el-select-dropdown__item.selected .zn-rotation-option-card { box-shadow: inset 0 0 0 1px var(--shift-selected-border, currentColor); }
+
+.shift-picker-chip { flex: 0 0 auto; width: max-content; max-width: 100%; }
+.shift-picker-dialog.is-day .shift-picker-option .shift-picker-chip { flex: 1 1 0; width: 100%; max-width: 100%; }
+.shift-picker-option .el-checkbox__inner { width: 16px; height: 16px; border-width: 1px; border-radius: 4px; }
+.shift-picker-option .el-checkbox__inner::after { top: 2px; left: 5px; }
+.shift-picker-option.is-selected .shift-picker-chip { border-color: var(--shift-selected-border, currentColor) !important; box-shadow: none; }
+
+.domestic-smart-cycle-shift .el-input__inner {
+  border-color: var(--cycle-shift-border, #d9d9d9);
+  background: var(--cycle-shift-bg, #fff);
+  color: var(--cycle-shift-color, #23252b);
+}
+
+.domestic-smart-cycle-popper .el-select-dropdown__item { height: auto; min-height: 56px; padding: 4px 8px; line-height: normal; }
+.domestic-smart-cycle-popper .el-select-dropdown__item.hover,
+.domestic-smart-cycle-popper .el-select-dropdown__item:hover,
+.domestic-smart-cycle-popper .el-select-dropdown__item.selected { background: transparent; }
+
+.zn-rotation-board__select .el-input__inner {
+  background: var(--rotation-shift-bg, #fff);
+  color: var(--rotation-shift-color, #23252b);
+}
+
+.zn-form-drawer__delete-btn.el-button { color: #fc3737; border-color: #fff0f0; background: #fff0f0; }
+.overview-person-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.overview-person-exception { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; padding: 0; border: 0; background: transparent; color: #fa8c16; cursor: pointer; }
+
+.zn-person-exception-dialog .el-dialog__header { padding: 20px 24px; border-bottom: 1px solid #eaeaea; }
+.zn-person-exception-dialog .el-dialog__footer { padding: 20px 24px; border-top: 1px solid #eaeaea; }
+.zn-person-exception-dialog .el-dialog__body { padding: 24px; border: 0; }
+.zn-person-exception-dialog .el-dialog__footer .el-button { border-radius: 8px !important; }

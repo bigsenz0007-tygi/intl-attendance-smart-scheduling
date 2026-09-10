@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>国内考勤 · 排班交互及视觉体验升级方案</title>
+  <style>
+    :root {
+      --bg: #f5f5f6;
+      --card: #ffffff;
+      --text: #23252b;
+      --text-2: #525765;
+      --text-3: #868d9f;
+      --line: #eaeaea;
+      --primary: #3c6ef0;
+      --success: #12b35d;
+      --warning: #ff7700;
+      --danger: #fc3737;
+      --radius: 8px;
+      --shadow: 0 2px 12px rgba(35, 37, 43, 0.08);
+      --font: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font: 14px/1.6 var(--font);
+      background:
+        radial-gradient(1200px 400px at 10% -10%, rgba(60, 110, 240, 0.08), transparent 60%),
+        radial-gradient(900px 360px at 90% 0%, rgba(18, 179, 93, 0.06), transparent 55%),
+        var(--bg);
+    }
+
+    .shell {
+      width: min(1080px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 40px 0 72px;
+    }
+
+    .hero {
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fff 0%, #f7f9ff 100%);
+      box-shadow: var(--shadow);
+    }
+
+    .hero__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 4px;
+      background: #edf2ff;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 24px;
+    }
+
+    .tag.is-muted {
+      background: #f1f2f4;
+      color: var(--text-2);
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 52em;
+      color: var(--text-2);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .hero__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .kpi {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .kpi strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--primary);
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .kpi span {
+      color: var(--text-3);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 20px 0 28px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+    }
+
+    nav.toc a {
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: var(--text-2);
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    nav.toc a:hover {
+      background: #edf2ff;
+      color: var(--primary);
+    }
+
+    section {
+      margin-bottom: 28px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    section h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    section h2 .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .lead {
+      margin: 0 0 20px;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+
+    h3 {
+      margin: 24px 0 12px;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    h3:first-of-type { margin-top: 0; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 16px 0 8px;
+    }
+
+    .flow__step {
+      position: relative;
+      padding: 14px 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fafbfc;
+    }
+
+    .flow__step::after {
+      content: "→";
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      font-size: 14px;
+    }
+
+    .flow__step:last-child::after { content: none; }
+
+    .flow__step b {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .flow__step span {
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    table.matrix {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    table.matrix th,
+    table.matrix td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    table.matrix th:last-child,
+    table.matrix td:last-child { border-right: 0; }
+
+    table.matrix tr:last-child td { border-bottom: 0; }
+
+    table.matrix thead th {
+      background: #f1f4f9;
+      color: var(--text);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    table.matrix tbody th {
+      width: 18%;
+      background: #fafbfc;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .prob {
+      color: var(--text-2);
+    }
+
+    .fix {
+      color: var(--text);
+    }
+
+    .why {
+      color: var(--text-3);
+      font-size: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      height: 20px;
+      margin-bottom: 6px;
+      padding: 0 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 20px;
+    }
+
+    .pill.is-p0 { background: #fff0f0; color: var(--danger); }
+    .pill.is-p1 { background: #fff7e8; color: var(--warning); }
+    .pill.is-p2 { background: #e8f8ef; color: var(--success); }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .card-mini {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fafbfc;
+    }
+
+    .card-mini h4 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .card-mini ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text-2);
+      font-size: 13px;
+    }
+
+    .card-mini li { margin: 6px 0; }
+
+    .principle {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .principle article {
+      padding: 16px;
+      border-left: 3px solid var(--primary);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      background: #f7f9ff;
+    }
+
+    .principle strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .principle p {
+      margin: 0;
+      color: var(--text-2);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    footer.doc-foot {
+      margin-top: 8px;
+      color: var(--text-3);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .shell { width: calc(100% - 24px); padding-top: 24px; }
+      .hero__grid,
+      .flow,
+      .two-col,
+      .principle { grid-template-columns: 1fr; }
+      .flow__step::after { content: none; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      nav.toc { display: none; }
+      section, .hero { box-shadow: none; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div class="hero__meta">
+        <span class="tag">国内考勤</span>
+        <span class="tag">排班倒班</span>
+        <span class="tag">智能排班</span>
+        <span class="tag is-muted">对照 PRD v1.0 · 2026.08.28</span>
+      </div>
+      <h1>排班交互及视觉体验升级 · 方案说明</h1>
+      <p>
+        基于《【国内考勤】排班交互及视觉体验升级项目》原稿问题清单，结合当前原型中的
+        <b>排班倒班主界面</b>与<b>国内智能排班向导</b>交互链路，整理「原稿问题 → 落地策略 → 设计理由」，
+        聚焦信息架构、操作效率与规则可感知性，不展开实现细节。
+      </p>
+      <div class="hero__grid">
+        <div class="kpi"><strong>2</strong><span>主链路：常规排班表 / 智能排班向导</span></div>
+        <div class="kpi"><strong>12</strong><span>原稿明确问题点已对位收口</span></div>
+        <div class="kpi"><strong>LUI 3.0</strong><span>字号 / 间距 / 控件高度统一规范</span></div>
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="目录">
+      <a href="#goal">目标与原则</a>
+      <a href="#flow">交互链路</a>
+      <a href="#normal">常规排班问题</a>
+      <a href="#smart">智能排班问题</a>
+      <a href="#why">设计取舍</a>
+    </nav>
+
+    <section id="goal">
+      <h2><span class="num">01</span>目标与原则</h2>
+      <p class="lead">对齐原稿：提效、重构信息架构、降低误操作与认知负荷。</p>
+      <div class="principle">
+        <article>
+          <strong>核心区优先</strong>
+          <p>压缩非核心操作占比，把可视面积还给「人 × 日」排班矩阵与智能配置表。</p>
+        </article>
+        <article>
+          <strong>任务分层</strong>
+          <p>顶栏放全局能力（智能排班 / 自动），工具栏随 Tab 显隐，统计页只留表格。</p>
+        </article>
+        <article>
+          <strong>规则外露</strong>
+          <p>互斥、切换、删除等高风险动作必须二次确认；班次色系与 chip 尺寸固定可扫读。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="flow">
+      <h2><span class="num">02</span>当前交互链路</h2>
+      <p class="lead">原型入口：排班倒班模块 → 智能排班（向导 / 弹窗按场景分流）。</p>
+
+      <h3>A. 常规排班（排班表）</h3>
+      <div class="flow">
+        <div class="flow__step"><b>Step 1</b><span>查询部门 / 考勤组 / 月份</span></div>
+        <div class="flow__step"><b>Step 2</b><span>Tab：排班表｜排班统计</span></div>
+        <div class="flow__step"><b>Step 3</b><span>工具栏编辑班次人员；智能排班入口 + 自动开关</span></div>
+        <div class="flow__step"><b>Step 4</b><span>矩阵编辑 / 筛选 / 保存导出</span></div>
+      </div>
+
+      <h3>B. 智能排班（国内向导）</h3>
+      <div class="flow">
+        <div class="flow__step"><b>Step 1</b><span>确认班次与出勤：月度固定 / 周期轮换</span></div>
+        <div class="flow__step"><b>Step 2</b><span>加人校验（互斥切换确认）</span></div>
+        <div class="flow__step"><b>Step 3</b><span>调整并发布排班表</span></div>
+        <div class="flow__step"><b>Step 4</b><span>回写排班倒班主表</span></div>
+      </div>
+
+      <div class="two-col" style="margin-top:20px">
+        <div class="card-mini">
+          <h4>排班表 Tab</h4>
+          <ul>
+            <li>展示操作工具栏、班次图例、排班矩阵</li>
+            <li>顶栏：智能排班、自动、引导、导出</li>
+            <li>次栏：临时修改 / 加人加班 / 密度 / 筛选保存</li>
+          </ul>
+        </div>
+        <div class="card-mini">
+          <h4>排班统计 Tab</h4>
+          <ul>
+            <li>不展示排班表工具栏，避免假操作入口</li>
+            <li>仅保留统计表格，降低信息噪声</li>
+            <li>Tab 去图标、间距 32、字号 14，对齐 LUI</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="normal">
+      <h2><span class="num">03</span>常规排班：原稿问题 → 方案</h2>
+      <p class="lead">对应 PRD 4.1.1。目标是「看得见班表、找得到操作、认得出班次」。</p>
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th style="width:22%">原稿问题</th>
+            <th style="width:36%">落地方案</th>
+            <th>为什么这样做 / 解决什么</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p0">P0</span><br />
+              非核心区占比高，核心矩阵被挤压，人多需横向猛滑
+            </td>
+            <td class="fix">
+              双层工具栏收敛：全局能力上置，编辑操作次置；统计 Tab 隐藏编辑工具栏；矩阵区最大化
+            </td>
+            <td class="why">把视觉权重还给「人员 × 日期」。减少滚动与视线跳跃，提升扫读与改班效率。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p0">P0</span><br />
+              操作菜单多且分散，无区域划分、无说明
+            </td>
+            <td class="form">
+              左侧编辑动作、右侧视图/筛选/保存；新手引导与导出贴近「自动」；筛选浮层行距 16px
+            </td>
+            <td class="why">按「改数据 / 看数据 / 学规则」分区，降低找按钮成本，避免操作区持续抢焦点。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p1">P1</span><br />
+              排班统计独立感强，用途不匹配单独 sheet 体感
+            </td>
+            <td class="fix">
+              保留同页 Tab，但不复用排班编辑工具；统计页只读表
+            </td>
+            <td class="why">统计与编辑任务目标不同。同入口切换，避免「看起来能改其实不该改」的误导。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p0">P0</span><br />
+              班次颜色混乱，难快速区分早/中/晚
+            </td>
+            <td class="form">
+              按班次族固定色板；图例 chip 定宽；时间单段展示，禁止超长双段撑宽
+            </td>
+            <td class="why">颜色承载语义而非装饰。固定尺寸保证矩阵对齐，降低「找色块」时间。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p1">P1</span><br />
+              操作指引与规则入口不明显
+            </td>
+            <td class="form">
+              顶栏固定「新手引导」；智能排班气泡提示；关键删除/切换二次确认
+            </td>
+            <td class="why">规则应「可被发现」。把帮助入口放到全局视线区，减少「不知道能不能点」。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="smart">
+      <h2><span class="num">04</span>智能排班：原稿问题 → 方案</h2>
+      <p class="lead">对应 PRD 4.2.1。核心矛盾是「推荐结果可改，但规则互斥且原路径过长」。</p>
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th style="width:22%">原稿问题</th>
+            <th style="width:36%">落地方案</th>
+            <th>为什么这样做 / 解决什么</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p0">P0</span><br />
+              非核心操作区占比过高（约 50%）
+            </td>
+            <td class="form">
+              向导两步：①确认出勤（月度/周期）②调整发布班表；查询信息收束为只读条
+            </td>
+            <td class="why">智能排班是「确认推荐 → 微调 → 发布」。压缩装饰与旁路操作，保证决策面在表上。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p2">P2</span><br />
+              「月度固定 / 周期轮换」命名不够通俗
+            </td>
+            <td class="form">
+              原型保留业务正式名；通过 Tab + 表格结构差异强化语义（人班次表 vs 人时段表）
+            </td>
+            <td class="why">短期不靠改名解决认知，而靠「看见不同表结构就懂」。改名需业务共识，避免线上口径分裂。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p0">P0</span><br />
+              月度固定：未绑定班次也展示，满屏无用 00000
+            </td>
+            <td class="form">
+              仅展示已排人员的班次行；无人班次不渲染
+            </td>
+            <td class="why">空配置不是信息。去掉噪声列/行，缩短横向扫视路径，避免误把 0 当有效计划。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p0">P0</span><br />
+              一人只能一种方式，原路径需先删后加；无提示
+            </td>
+            <td class="form">
+              两侧均可选全员；若已在另一侧，二次确认后自动迁移
+            </td>
+            <td class="why">把「互斥规则」从隐式约束变成显式交互。缩短切换路径，防止双份排班冲突。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p1">P1</span><br />
+              周期轮换操作按钮过近，易误删
+            </td>
+            <td class="form">
+              复制 / 删除分区；删人二次确认；段内删除用垃圾桶并与下拉分离
+            </td>
+            <td class="why">降低误触成本。复制改为「套配置给其他人」，符合真实复用意图。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p0">P0</span><br />
+              周期分段固定 4 段，且只能从后往前删
+            </td>
+            <td class="form">
+              时段可任意增删；表头随段数扩展；一屏约 4 段，超出横滑；人员/操作列 sticky
+            </td>
+            <td class="why">满足「多段轮换」真实业务，同时保证单屏可读。随意删段避免被迫倒序维护。</td>
+          </tr>
+          <tr>
+            <td class="prob">
+              <span class="pill is-p1">P1</span><br />
+              发布班表操作区偏弱
+            </td>
+            <td class="form">
+              第二步独立「调整并发布」；图例可收起；过去日期弱化、今日高亮
+            </td>
+            <td class="why">发布是终局动作，应有独立决策空间；弱化历史日降低干扰。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="why">
+      <h2><span class="num">05</span>关键取舍说明</h2>
+      <p class="lead">方案选择的底层逻辑：优先「任务完成路径」与「错误成本」，其次才是视觉装饰。</p>
+      <div class="two-col">
+        <div class="card-mini">
+          <h4>做了什么</h4>
+          <ul>
+            <li>信息架构分层：全局 / 编辑 / 只读统计</li>
+            <li>智能排班互斥规则产品化（确认即切换）</li>
+            <li>周期时段自由增删 + 横滑可读</li>
+            <li>班次视觉：色板语义化、chip 定宽</li>
+            <li>LUI PC3.0：14 字号、16 间距、32 控件高</li>
+          </ul>
+        </div>
+        <div class="card-mini">
+          <h4>刻意没做什么</h4>
+          <ul>
+            <li>未强行改「月度固定/周期轮换」业务命名</li>
+            <li>未把统计能力硬塞进编辑工具栏</li>
+            <li>未用更多弹层替代表格内联编辑</li>
+            <li>历史数据迁移：原稿为「无」，本期不扩 scope</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>验收关注点（精简）</h3>
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>场景</th>
+            <th>预期</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>排班统计 Tab</td>
+            <td>无编辑工具栏，仅统计表</td>
+          </tr>
+          <tr>
+            <td>月度固定空班次</td>
+            <td>无人班次不出现，无 00000 噪声</td>
+          </tr>
+          <tr>
+            <td>月度 ↔ 周期加人</td>
+            <td>互斥确认后自动迁移并落表展示</td>
+          </tr>
+          <tr>
+            <td>周期 &gt; 4 段</td>
+            <td>可横滑查看；可删任意段；可继续添加</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer class="doc-foot">
+      对照原稿：《【国内考勤】排班交互及视觉体验升级项目》v1.0（2026.08.28） ·
+      方案梳理基于当前原型交互实现，供评审对齐使用
+    </footer>
+  </div>
+</body>
+</html>

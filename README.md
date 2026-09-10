@@ -1,5 +1,6 @@
 # 海外仓智能排班设计预览
 
+- 在线预览：`https://bigsenz0007-tygi.github.io/intl-attendance-smart-scheduling/`
 - 本地预览：`http://127.0.0.1:4177/`
 - 技术基线：Vue 2.7 + `@lui/lui-ui` 2.15.27
 - 原始扫描仓库仅提供只读框架和依赖参考，本项目不修改扫描仓库源码。

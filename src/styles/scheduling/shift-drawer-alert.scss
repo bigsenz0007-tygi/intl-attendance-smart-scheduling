@@ -1,0 +1,56 @@
+/* 新增/编辑班次抽屉 · LUI PC3.0 橙色提示态。 */
+body:has(.overseas-schedule-root) .zn-form-drawer .el-alert {
+  border-radius: 8px;
+}
+
+body:has(.overseas-schedule-root) .zn-form-drawer__alert {
+  margin-bottom: var(--zn-drawer-space-md);
+  padding: 8px 16px;
+  color: #525765;
+  border: 1px solid #ffd9b8;
+  background: #fff7e8;
+}
+
+body:has(.overseas-schedule-root) .zn-form-drawer__alert.el-alert--warning.is-light {
+  color: #525765;
+  border-color: #ffd9b8;
+  background-color: #fff7e8;
+}
+
+body:has(.overseas-schedule-root) .zn-form-drawer__alert .el-alert__icon,
+body:has(.overseas-schedule-root) .zn-form-drawer__alert.el-alert--warning .el-alert__icon {
+  width: 16px;
+  color: #ff7700;
+  font-size: 16px;
+}
+
+body:has(.overseas-schedule-root) .zn-form-drawer__alert .el-alert__content {
+  padding: 0 8px;
+}
+
+body:has(.overseas-schedule-root) .zn-form-drawer__alert .el-alert__title,
+body:has(.overseas-schedule-root) .zn-form-drawer__alert .el-alert__title.is-bold {
+  color: #525765;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+body:has(.overseas-schedule-root) .zn-shift-alert-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  color: #3c6ef0;
+  background: transparent;
+  font: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+body:has(.overseas-schedule-root) .zn-shift-alert-contact:hover,
+body:has(.overseas-schedule-root) .zn-shift-alert-contact:focus {
+  color: #638bf3;
+  outline: 0;
+}

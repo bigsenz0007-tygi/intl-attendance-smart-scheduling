@@ -1,58 +1,78 @@
 <template>
-  <div class="overseas-schedule-root" :class="{ 'is-wizard-mode': viewMode === 'wizard' }">
+  <div class="overseas-schedule-root" :class="{ 'is-wizard-mode': isWizardLayout, 'is-page-fullscreen': pageFullscreen }">
   <Index class="overseas-schedule-app" :header="true" :aside="true" :content="true">
     <header class="topbar">
       <div class="brand">
         <div class="brand-logo-group">
-          <img class="brand-logo-mark" :src="jdlMark" alt="JDL" width="53" height="24">
-          <span class="brand-company">京东物流</span>
+          <img class="brand-logo-mark brand-logo-combined" :src="brandLogo" alt="京东物流" width="120" height="20">
         </div>
-        <span class="brand-divider"></span>
-        <strong class="brand-title">国际考勤</strong>
+        <strong class="brand-title">考勤管理</strong>
       </div>
       <div class="topbar-actions">
-        <span><i class="el-icon-question"></i>【帮助中心】</span>
-        <span><i class="el-icon-chat-dot-round"></i>【上线公告】</span>
-        <span><i class="el-icon-refresh"></i>【权限刷新】</span>
-        <span class="avatar">AM</span>
-        <span>Amy Miller <i class="el-icon-arrow-down"></i></span>
+        <div class="topbar-tools">
+          <button type="button" class="topbar-tool" title="帮助中心" aria-label="帮助中心">
+            <shell-icon name="help" />
+          </button>
+          <button type="button" class="topbar-tool" title="上线公告" aria-label="上线公告">
+            <shell-icon name="notice" />
+          </button>
+          <button type="button" class="topbar-tool" title="权限刷新" aria-label="权限刷新">
+            <shell-icon name="refresh" />
+          </button>
+        </div>
+        <div class="topbar-user">
+          <span class="avatar">AM</span>
+          <span class="topbar-user__name">Amy Miller</span>
+          <shell-icon class="topbar-user__arrow" name="arrowDown" />
+        </div>
       </div>
     </header>
 
-    <aside class="sidebar">
-      <div class="nav-group">
-        <div
-          v-for="item in navItems"
-          :key="item.label"
-          class="nav-item"
-          :class="{ active: item.mode ? viewMode === item.mode : item.active }"
-          @click="handleNav(item)"
-        >
-          <i :class="item.icon"></i><span>{{ item.label }}</span><i v-if="item.expand" class="el-icon-arrow-down nav-arrow"></i>
-        </div>
-      </div>
-      <div class="sidebar-foot"><i class="el-icon-s-fold"></i><span>收起菜单</span></div>
-    </aside>
+    <AppSidebar
+      v-show="!pageFullscreen"
+      :view-mode="sidebarViewMode"
+      @navigate="onShellNavigate"
+    />
 
-    <main class="workspace" :class="{ 'is-wizard': viewMode === 'wizard' }">
-      <div class="page-tabs">
-        <span class="page-tab-home">首页</span>
-        <span class="page-tab-active">{{ currentPageTitle }} <i class="el-icon-close"></i></span>
-      </div>
+    <main class="workspace" :class="{ 'is-wizard': isWizardLayout }">
+      <AppQuickMenuTabs
+        :active-title="currentPageTitle"
+        :show-fullscreen="isScheduleView || isWizardLayout"
+        :fullscreen="pageFullscreen"
+        @toggle-fullscreen="togglePageFullscreen"
+        @refresh="refreshCurrentPage"
+      />
+
+      <ZnShiftModule
+        v-if="viewMode === 'schedule-domestic'"
+        ref="znShiftModule"
+        :initial-context="domesticScheduleContext"
+        @query-schedule="handleDomesticScheduleQuery"
+        @open-smart-schedule="openDomesticSmartSchedule"
+      />
 
       <ScheduleOverview
-        v-if="viewMode === 'overview'"
+        v-else-if="viewMode === 'schedule-intl'"
         :dates="displayDates"
         :shifts="shifts"
         :scheduleRows="scheduleRows"
         :picker-open="shiftPickerVisible"
         :picker-anchor="shiftPickerTarget"
-        @start-scheduling="startOver"
+        :initial-context="intlScheduleContext"
+        @start-scheduling="openIntlSmartSchedule"
+        @query-schedule="handleIntlScheduleQuery"
         @replace-shift="openShiftPicker"
         @open-auto-config="autoDialogVisible = true"
       />
 
-      <section v-else-if="viewMode === 'wizard'" class="wizard-card">
+      <DomesticSmartWizard
+        v-else-if="viewMode === 'smart-domestic'"
+        :initial-context="domesticScheduleContext"
+        @cancel="openScheduleDomestic"
+        @published="openScheduleDomestic"
+      />
+
+      <section v-else-if="viewMode === 'smart-intl'" class="wizard-card">
         <div class="arrow-steps-card">
           <div class="arrow-steps" role="list" aria-label="智能排班流程">
             <div
@@ -149,7 +169,7 @@
                         >
                           <b>{{ signedDiff(dailyHoursActual[dateMetricIndex(date)] - dailyHoursRecommended[dateMetricIndex(date)]) }}</b><small>h</small>
                         </em>
-                        <i class="el-icon-arrow-right"></i>
+                        <shell-icon name="chevronRight" size="sm" />
                       </button>
                     </td>
                   </tr>
@@ -184,7 +204,7 @@
                         v-if="row.shifts[date.key] !== '休'"
                         class="shift-chip"
                         :class="{ 'is-picker-active': isPickerAnchor(row, date.key) }"
-                        :style="shiftStyle(row.shifts[date.key], isPickerAnchor(row, date.key))"
+                        :style="shiftStyle(row.shifts[date.key], isPickerAnchor(row, date.key))" :title="`${shiftName(row.shifts[date.key])} ${formatShiftRange(shiftFullTime(row.shifts[date.key]))}`"
                         @dblclick.stop.prevent="openShiftPicker(row, date.key, $event)"
                       >
                         <b>{{ shiftName(row.shifts[date.key]) }}</b>
@@ -207,7 +227,7 @@
       </section>
 
       <footer
-        v-if="viewMode === 'wizard'"
+        v-if="isWizardView"
         class="flow-actions wizard-flow-actions"
       >
         <el-button @click="cancelWizard">取消</el-button>
@@ -224,7 +244,7 @@
       :close-on-click-modal="false"
       :destroy-on-close="false"
       append-to-body
-      width="640px"
+      width="500px"
       top="0"
       @opened="onShiftPickerOpened"
       @closed="resetShiftPicker"
@@ -235,18 +255,26 @@
           role="tab"
           class="shift-picker-tab"
           :class="{ 'is-active': shiftPickerTab === 'day' }"
-          @click="shiftPickerTab = 'day'"
-        >按天排班</button>
+          @click="selectShiftPickerTab('day')"
+        >按班次排</button>
         <button
           type="button"
           role="tab"
           class="shift-picker-tab"
           :class="{ 'is-active': shiftPickerTab === 'cycle' }"
-          @click="shiftPickerTab = 'cycle'"
-        >周期排班</button>
+          @click="selectShiftPickerTab('cycle')"
+        >按轮班排</button>
+        <button
+          type="button"
+          role="tab"
+          class="shift-picker-tab"
+          :class="{ 'is-active': shiftPickerTab === 'temporary' }"
+          @click="selectShiftPickerTab('temporary')"
+        >修改临时排班</button>
       </div>
       <div class="shift-picker-body">
         <el-input
+          v-if="shiftPickerTab === 'day'"
           v-model="shiftPickerKeyword"
           clearable
           prefix-icon="el-icon-search"
@@ -264,25 +292,29 @@
             />
             <span
               class="shift-picker-chip"
-              :class="{
-                'is-outlined': shift.outlined,
-                'is-rest': shift.isRest,
-                'is-selected': selectedPickerShiftIds.includes(shift.id),
-              }"
-              :style="pickerChipStyle(shift)"
+              :class="{ 'is-rest': shift.isRest }"
+              :style="pickerChipStyle(shift)" :title="`${shift.name} ${formatShiftRange(shift.time)}`"
             >
               <b>{{ shift.name }}</b>
               <small>{{ formatShiftRange(shift.time) }}</small>
             </span>
           </label>
         </div>
-        <div v-else class="shift-picker-cycle-empty">
-          周期排班为原型占位，当前请使用「按天排班」更换班次。
+        <div v-else-if="shiftPickerTab === 'cycle'" class="shift-picker-cycle">
+          <el-switch v-model="shiftPickerCycleApplyAll" />
+          <span>从当前选中日期开始，应用到当前全部时间范围</span>
         </div>
+        <temporary-shift-editor
+          v-else
+          v-model="temporaryShiftForm"
+          :shift-name="temporaryShiftBase.name"
+        />
       </div>
       <span slot="footer" class="shift-picker-footer">
         <el-button @click="shiftPickerVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveShiftPicker">保存</el-button>
+        <el-button v-if="shiftPickerTab === 'day'" @click="clearPickerShifts">清空</el-button>
+        <el-button v-else-if="shiftPickerTab === 'cycle'" @click="clearCyclePicker">清空</el-button>
+        <el-button type="primary" @click="saveShiftPicker">{{ shiftPickerTab === 'temporary' ? '确定' : '保存' }}</el-button>
       </span>
     </el-dialog>
 
@@ -305,7 +337,7 @@
     </el-dialog>
 
     <el-dialog title="人员明细" class="people-detail-dialog detail-dialog" :visible.sync="peopleDetailVisible" :closeOnClickModal="false" :destroyOnClose="true" width="720px">
-      <el-table :data="peopleDetailRows" border class="people-detail-table">
+      <el-table :data="peopleDetailRows" border :max-height="360" class="people-detail-table">
         <el-table-column prop="group" label="环节" min-width="140"></el-table-column>
         <el-table-column prop="recommended" label="推荐人数" min-width="120"></el-table-column>
         <el-table-column prop="actual" label="实排人数" min-width="120"></el-table-column>
@@ -323,9 +355,16 @@
 <script>
 import ForecastMatrix from './components/ForecastMatrix.vue'
 import ScheduleOverview from './components/ScheduleOverview.vue'
-import jdlMark from './assets/jdl-mark.svg'
+import TemporaryShiftEditor from './components/TemporaryShiftEditor.vue'
+import ZnShiftModule from './zn/ZnShiftModule.vue'
+import DomesticSmartWizard from './zn/DomesticSmartWizard.vue'
+import AppSidebar from './components/shell/AppSidebar.vue'
+import AppQuickMenuTabs from './components/shell/AppQuickMenuTabs.vue'
+import ShellIcon from './components/shell/ShellIcon.vue'
 import { assetUrl } from './utils/assetUrl'
 import { dates, forecastRows, shifts, scheduleRows } from './data/mock'
+import pageFullscreen from './mixins/workspaceFullscreen'
+import { resolveShiftChipStyle, decorateShift } from './utils/shiftPalette'
 
 const passthrough = (name, className) => ({
   name,
@@ -335,17 +374,39 @@ const passthrough = (name, className) => ({
 
 export default {
   name: 'App',
+  mixins: [pageFullscreen],
   components: {
     ForecastMatrix,
     ScheduleOverview,
+    TemporaryShiftEditor,
+    ZnShiftModule,
+    DomesticSmartWizard,
+    AppSidebar,
+    AppQuickMenuTabs,
+    ShellIcon,
     Index: passthrough('Index', 'prototype-shell'),
     SchedulingList: passthrough('SchedulingList', 'scheduling-list-adapter'),
     UserInfoCellOfScheduleTable: passthrough('UserInfoCellOfScheduleTable', 'user-info-cell-adapter'),
   },
   data() {
     return {
-      jdlMark,
-      viewMode: 'overview',
+      brandLogo: assetUrl('shell/jdl-logo-combined.svg'),
+      viewMode: 'schedule-domestic',
+      domesticScheduleContext: {
+        department: 'tz-yz',
+        attendanceGroup: 'default',
+        processGroup: 'all',
+        scheduleMonth: '2026-09',
+        scene: 'domestic',
+      },
+      intlScheduleContext: {
+        department: 'nl-01',
+        attendanceGroup: 'all',
+        processGroup: 'all',
+        scheduleMonth: '2026-07',
+        scheduleRange: ['2026-07-01', '2026-07-31'],
+        scene: 'international',
+      },
       activeStep: 0,
       workflowSteps: [
         {
@@ -387,6 +448,14 @@ export default {
       shiftPickerAnchorEl: null,
       shiftPickerReady: false,
       shiftPickerScrollLockY: 0,
+      shiftPickerCycleApplyAll: false,
+      temporaryShiftForm: {
+        date: '',
+        crossNight: '否',
+        boundaryHours: 1,
+        startTime: '',
+        endTime: '',
+      },
       dailyHoursActual: [90, 90, 90, 90, 90, 90, 90, 90],
       dailyHoursRecommended: [100, 100, 100, 100, 100, 100, 100, 100],
       dailyHoursForecast: [92, 92, 92, 92, 92, 92, 92, 92],
@@ -402,19 +471,6 @@ export default {
       notifyException: true,
       hoursDetailVisible: false,
       peopleDetailVisible: false,
-      navItems: [
-        { label: '首页', icon: 'el-icon-house' },
-        { label: '用户管理', icon: 'el-icon-user', expand: true },
-        { label: '考勤组管理', icon: 'el-icon-s-custom' },
-        { label: '基础配置', icon: 'el-icon-setting', expand: true },
-        { label: '排班管理', icon: 'el-icon-date', expand: true },
-        { label: '排班总览', icon: 'el-icon-s-grid', mode: 'overview' },
-        { label: '新建排班', icon: 'el-icon-magic-stick', mode: 'wizard' },
-        { label: '异常管理', icon: 'el-icon-warning-outline' },
-        { label: '报表管理', icon: 'el-icon-document' },
-        { label: '我的流程', icon: 'el-icon-tickets' },
-        { label: '数据看板', icon: 'el-icon-data-analysis', expand: true },
-      ],
       peopleDetailRows: [
         { group: '5S', recommended: '3人', actual: '3人', diff: '0人', diffValue: 0 },
         { group: '保安', recommended: '2人', actual: '2人', diff: '0人', diffValue: 0 },
@@ -424,14 +480,26 @@ export default {
     }
   },
   computed: {
-    currentPageTitle() {
-      if (this.viewMode === 'overview') return '海外排班总览'
-      return '海外智能排班'
+    isWizardView() {
+      return this.viewMode === 'smart-intl'
     },
-    currentPageDescription() {
-      return this.viewMode === 'overview'
-        ? '查看已发布排班，按部门和环节维护未来 7 天的班次、工时与人员安排。'
-        : '基于业务环节预测量、人效和用工成本，为海外仓生成未来 7 天排班建议。'
+    isWizardLayout() {
+      return this.viewMode === 'smart-intl' || this.viewMode === 'smart-domestic'
+    },
+    isScheduleView() {
+      return this.viewMode === 'schedule-domestic' || this.viewMode === 'schedule-intl'
+    },
+    sidebarViewMode() {
+      return this.viewMode
+    },
+    currentPageTitle() {
+      const titles = {
+        'schedule-domestic': '排班倒班',
+        'schedule-intl': '排班倒班（国际）',
+        'smart-domestic': '智能排班',
+        'smart-intl': '智能排班（国际）',
+      }
+      return titles[this.viewMode] || '排班倒班'
     },
     displayDates() {
       return this.dates.slice(1)
@@ -467,28 +535,116 @@ export default {
       })
     },
     shiftPickerDialogClass() {
-      return this.shiftPickerReady ? 'shift-picker-dialog is-ready' : 'shift-picker-dialog'
+      return [
+        'shift-picker-dialog',
+        'app-shift-picker-dialog',
+        this.shiftPickerReady ? 'is-ready' : '',
+      ].filter(Boolean).join(' ')
+    },
+    temporaryShiftBase() {
+      if (!this.shiftPickerTarget) return { name: '--', time: '' }
+      const { row, dateKey } = this.shiftPickerTarget
+      const shiftId = row && row.shifts ? row.shifts[dateKey] : null
+      if (shiftId === '休' || shiftId === 'REST') return { name: '休息', time: '00:00-23:59', isRest: true }
+      return this.shifts.find((shift) => shift.id === shiftId) || { name: '--', time: '' }
+    },
+  },
+  watch: {
+    isScheduleView(isSchedule) {
+      if (!isSchedule) this.exitPageFullscreen()
     },
   },
   methods: {
-    handleNav(item) {
-      if (item.mode === 'overview') this.openOverview()
-      if (item.mode === 'wizard') this.startOver()
+    async confirmDomesticDraft(message) {
+      const mod = this.$refs.znShiftModule
+      if (!mod || !mod.hasUnsavedBoardChanges) return true
+      try {
+        await this.$confirm(message, '提示', { type: 'warning', confirmButtonText: '确定', cancelButtonText: '取消' })
+        mod.hasUnsavedBoardChanges = false
+        return true
+      } catch (error) { return false }
     },
-    openOverview() {
-      this.viewMode = 'overview'
+    async refreshCurrentPage() {
+      if (!(await this.confirmDomesticDraft('还有排班没有保存，确定刷新吗？'))) return
+      window.location.reload()
+    },
+    async onShellNavigate(mode) {
+      if (mode !== this.viewMode && !(await this.confirmDomesticDraft('还有排班没有保存，确定离开吗？'))) return
+      if (mode === 'schedule-domestic') this.openScheduleDomestic()
+      else if (mode === 'schedule-intl') this.openScheduleIntl()
+      else if (mode === 'smart-domestic') this.openDomesticSmartSchedule(this.liveDomesticScheduleContext())
+      else if (mode === 'smart-intl') this.openIntlSmartSchedule()
+    },
+    openScheduleDomestic() {
+      this.viewMode = 'schedule-domestic'
       window.scrollTo({ top: 0, behavior: 'smooth' })
     },
-    startOver(filters = {}) {
+    openScheduleIntl() {
+      this.viewMode = 'schedule-intl'
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    liveDomesticScheduleContext() {
+      const mod = this.$refs.znShiftModule
+      if (!mod) return {}
+      return {
+        department: mod.department,
+        attendanceGroup: mod.attendanceGroup,
+        scheduleMonth: mod.scheduleMonth,
+        processGroup: 'all',
+      }
+    },
+    isBackOfficeZnContext(context = {}) {
+      return context.department === 'hb-zn-01' || context.attendanceGroup === 'zn-001'
+    },
+    openDomesticSmartSchedule(context = {}) {
+      const merged = {
+        ...this.domesticScheduleContext,
+        ...context,
+        scene: 'domestic',
+      }
+      this.domesticScheduleContext = merged
+      if (this.isBackOfficeZnContext(merged)) {
+        this.viewMode = 'schedule-domestic'
+        this.$nextTick(() => {
+          const mod = this.$refs.znShiftModule
+          if (mod && typeof mod.openSmartConfig === 'function') mod.openSmartConfig()
+        })
+        return
+      }
+      this.viewMode = 'smart-domestic'
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    openIntlSmartSchedule(filters = {}) {
       const payload = filters && typeof filters === 'object' && !filters.type ? filters : {}
-      this.viewMode = 'wizard'
+      this.intlScheduleContext = {
+        ...this.intlScheduleContext,
+        ...payload,
+        scene: 'international',
+      }
+      this.viewMode = 'smart-intl'
       this.activeStep = 0
-      this.department = payload.department || 'nl-01'
-      this.processGroup = payload.processGroup || 'all'
+      this.department = payload.department || this.intlScheduleContext.department || 'nl-01'
+      this.processGroup = payload.processGroup || this.intlScheduleContext.processGroup || 'all'
       this.scheduleKeyword = ''
       window.scrollTo({ top: 0, behavior: 'smooth' })
     },
-    cancelWizard() { this.openOverview() },
+    handleDomesticScheduleQuery(context = {}) {
+      this.domesticScheduleContext = {
+        ...this.domesticScheduleContext,
+        ...context,
+        scene: 'domestic',
+      }
+    },
+    handleIntlScheduleQuery(context = {}) {
+      this.intlScheduleContext = {
+        ...this.intlScheduleContext,
+        ...context,
+        scene: 'international',
+      }
+    },
+    cancelWizard() {
+      this.openScheduleIntl()
+    },
     previousStep() {
       if (this.activeStep > 0) this.activeStep -= 1
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -524,28 +680,12 @@ export default {
     shiftStyle(shiftId, selected = false) {
       const shift = this.shifts.find((item) => item.id === shiftId)
       if (!shift || shift.isRest) return this.restCellStyle(selected)
-      let style
-      if (shift.outlined) {
-        style = {
-          background: shift.light,
-          color: shift.color,
-          borderColor: shift.color,
-        }
-      } else {
-        style = { background: shift.color, color: '#fff', borderColor: shift.color }
-      }
-      if (selected) {
-        const stroke = this.darkenHex(shift.color, 0.08)
-        style.borderColor = stroke
-        // inset 避免外描边被单元格 overflow 裁切
-        style.boxShadow = `inset 0 0 0 1px ${stroke}`
-      }
-      return style
+      return resolveShiftChipStyle(shift, selected)
     },
     restCellStyle(selected = false) {
       if (!selected) return {}
       const stroke = this.darkenHex('#A8AEB8', 0.08)
-      return { borderColor: stroke, boxShadow: `inset 0 0 0 1px ${stroke}` }
+      return { borderColor: stroke, boxShadow: `inset 0 0 0 2px ${stroke}` }
     },
     darkenHex(hex, amount = 0.08) {
       if (!hex || typeof hex !== 'string') return '#525765'
@@ -579,57 +719,47 @@ export default {
       return shift ? shift.time : ''
     },
     pickerChipStyle(shift) {
-      const selected = this.selectedPickerShiftIds.includes(shift.id)
-      let style
-      if (shift.isRest) {
-        style = { background: shift.light, color: '#525765', borderColor: '#D9D9D9' }
-      } else if (shift.outlined) {
-        style = { background: shift.light, color: shift.color, borderColor: shift.color }
-      } else {
-        style = { background: shift.color, color: '#fff', borderColor: shift.color }
-      }
-      if (selected) {
-        const stroke = this.darkenHex(shift.isRest ? '#A8AEB8' : shift.color, 0.08)
-        style.borderColor = stroke
-        style.boxShadow = `inset 0 0 0 1px ${stroke}`
-      }
-      return style
+      return resolveShiftChipStyle(shift)
     },
-    calcShiftPickerCoords(anchorEl) {
-      const gap = 8
-      const dw = 640
-      const dh = 420
+    resolvePickerShiftStored(shiftId) {
+      if (!shiftId) return '休'
+      const shift = this.shifts.find((item) => item.id === shiftId)
+      return shift && shift.isRest ? '休' : shiftId
+    },
+    applyPickerShiftToTarget(shiftId) {
+      if (!this.shiftPickerTarget) return
+      const { row, dateKey } = this.shiftPickerTarget
+      this.$set(row.shifts, dateKey, this.resolvePickerShiftStored(shiftId))
+    },
+    calcShiftPickerCoords(anchorEl, dialogWidth = 500, dialogHeight = 520) {
+      const viewportPadding = 16
+      const anchorGap = 12
+      const maxLeft = Math.max(viewportPadding, window.innerWidth - dialogWidth - viewportPadding)
+      const maxTop = Math.max(viewportPadding, window.innerHeight - dialogHeight - viewportPadding)
       if (!anchorEl || typeof anchorEl.getBoundingClientRect !== 'function') {
         return {
-          left: Math.max(gap, Math.round((window.innerWidth - dw) / 2)),
-          top: 120,
+          left: Math.round(Math.min(maxLeft, Math.max(viewportPadding, (window.innerWidth - dialogWidth) / 2))),
+          top: Math.round(Math.min(maxTop, Math.max(viewportPadding, 120))),
         }
       }
       const rect = anchorEl.getBoundingClientRect()
-      let left = rect.right + gap
-      if (left + dw > window.innerWidth - gap) left = rect.left - dw - gap
-      if (left < gap) left = gap
-      let top = rect.top
-      if (top + dh > window.innerHeight - gap) top = window.innerHeight - dh - gap
-      if (top < gap) top = gap
+      let left
+      if (rect.right + anchorGap + dialogWidth <= window.innerWidth - viewportPadding) {
+        left = rect.right + anchorGap
+      } else if (rect.left - anchorGap - dialogWidth >= viewportPadding) {
+        left = rect.left - anchorGap - dialogWidth
+      } else {
+        left = rect.left + ((rect.width - dialogWidth) / 2)
+      }
+      left = Math.min(maxLeft, Math.max(viewportPadding, left))
+      const top = Math.min(maxTop, Math.max(viewportPadding, rect.top))
       return { left: Math.round(left), top: Math.round(top) }
     },
     applyShiftPickerCoords(anchorEl, measuredDialog) {
-      const gap = 8
-      const dialog = measuredDialog || document.querySelector('.shift-picker-dialog')
-      const dw = (dialog && dialog.offsetWidth) || 640
-      const dh = (dialog && dialog.offsetHeight) || 420
-      let coords = this.calcShiftPickerCoords(anchorEl)
-      if (anchorEl && typeof anchorEl.getBoundingClientRect === 'function') {
-        const rect = anchorEl.getBoundingClientRect()
-        let left = rect.right + gap
-        if (left + dw > window.innerWidth - gap) left = rect.left - dw - gap
-        if (left < gap) left = gap
-        let top = rect.top
-        if (top + dh > window.innerHeight - gap) top = window.innerHeight - dh - gap
-        if (top < gap) top = gap
-        coords = { left: Math.round(left), top: Math.round(top) }
-      }
+      const dialog = measuredDialog || document.querySelector('.app-shift-picker-dialog')
+      const dialogWidth = (dialog && dialog.offsetWidth) || Math.min(500, window.innerWidth - 32)
+      const dialogHeight = (dialog && dialog.offsetHeight) || 520
+      const coords = this.calcShiftPickerCoords(anchorEl, dialogWidth, dialogHeight)
       document.documentElement.style.setProperty('--shift-picker-left', `${coords.left}px`)
       document.documentElement.style.setProperty('--shift-picker-top', `${coords.top}px`)
       if (dialog) {
@@ -674,11 +804,15 @@ export default {
     },
     blockBackgroundWheel(event) {
       if (!this.shiftPickerVisible) return
-      const dialog = document.querySelector('.shift-picker-dialog')
+      const dialog = document.querySelector('.app-shift-picker-dialog')
       if (dialog && dialog.contains(event.target)) return
       event.preventDefault()
     },
-    openShiftPicker(row, dateKey, event) {
+    openShiftPicker(row, dateOrKey, event) {
+      const dateKey = typeof dateOrKey === 'object' ? dateOrKey.key : dateOrKey
+      const fullDate = typeof dateOrKey === 'object' && dateOrKey.fullDate
+        ? dateOrKey.fullDate
+        : this.resolveTemporaryShiftDate(dateKey)
       const current = row.shifts[dateKey]
       const mapped = current === '休' ? 'REST' : current
       const anchor = event && event.currentTarget ? event.currentTarget : null
@@ -687,7 +821,9 @@ export default {
       this.shiftPickerAnchorEl = anchor
       this.shiftPickerTab = 'day'
       this.shiftPickerKeyword = ''
+      this.shiftPickerCycleApplyAll = false
       this.selectedPickerShiftIds = mapped ? [mapped] : []
+      this.initializeTemporaryShiftForm(current, fullDate)
       // 打开前先写入坐标，避免左上角闪一下
       this.applyShiftPickerCoords(anchor)
       this.lockBackgroundScroll()
@@ -721,8 +857,9 @@ export default {
     },
     onShiftPickerOutside(event) {
       if (!this.shiftPickerVisible) return
-      const dialog = document.querySelector('.shift-picker-dialog')
+      const dialog = document.querySelector('.app-shift-picker-dialog')
       const target = event.target
+      if (target && target.closest && target.closest('.shift-picker-control-popper')) return
       if (dialog && dialog.contains(target)) return
       if (this.shiftPickerAnchorEl && this.shiftPickerAnchorEl.contains(target)) return
       this.shiftPickerVisible = false
@@ -730,12 +867,72 @@ export default {
     togglePickerShift(shiftId, selected) {
       if (selected) {
         this.selectedPickerShiftIds = [shiftId]
+        this.applyPickerShiftToTarget(shiftId)
         return
       }
       this.selectedPickerShiftIds = this.selectedPickerShiftIds.filter((id) => id !== shiftId)
     },
     clearPickerShifts() {
       this.selectedPickerShiftIds = []
+      this.applyPickerShiftToTarget(null)
+    },
+    clearCyclePicker() {
+      this.shiftPickerCycleApplyAll = false
+    },
+    selectShiftPickerTab(tab) {
+      this.shiftPickerTab = tab
+      if (tab === 'temporary' && this.shiftPickerTarget) {
+        const { row, dateKey } = this.shiftPickerTarget
+        this.initializeTemporaryShiftForm(row.shifts[dateKey], this.resolveTemporaryShiftDate(dateKey))
+      }
+      this.$nextTick(() => this.applyShiftPickerCoords(this.shiftPickerAnchorEl))
+    },
+    resolveTemporaryShiftDate(dateKey) {
+      const matched = this.displayDates.find((date) => date.key === dateKey)
+      if (matched && matched.fullDate) return matched.fullDate
+      const year = String((this.intlScheduleContext.scheduleRange || [])[0] || this.intlScheduleContext.scheduleMonth || '2026').slice(0, 4)
+      return `${year}-${dateKey}`
+    },
+    initializeTemporaryShiftForm(shiftId, date) {
+      const shift = shiftId === '休' || shiftId === 'REST'
+        ? { time: '00:00-23:59' }
+        : this.shifts.find((item) => item.id === shiftId)
+      const [startTime = '09:00', endTime = '18:00'] = String((shift && shift.time) || '09:00-18:00').split('-')
+      this.temporaryShiftForm = {
+        date,
+        crossNight: endTime <= startTime ? '是' : '否',
+        boundaryHours: 1,
+        startTime,
+        endTime,
+      }
+    },
+    saveTemporaryShift() {
+      if (!this.shiftPickerTarget) return false
+      const { row, dateKey: sourceDateKey } = this.shiftPickerTarget
+      const { date, startTime, endTime } = this.temporaryShiftForm
+      if (!date || !startTime || !endTime) {
+        this.$message.warning('请完整填写班次日期和上下班时间')
+        return false
+      }
+      const sourceShiftId = row.shifts[sourceDateKey]
+      const base = sourceShiftId === '休' || sourceShiftId === 'REST'
+        ? { name: '临时班次' }
+        : (this.shifts.find((item) => item.id === sourceShiftId) || { name: '临时班次' })
+      const targetDateKey = date.slice(5)
+      const id = `TEMP-${row.id}-${date.replace(/-/g, '')}-${Date.now()}`
+      const temporaryShift = decorateShift({
+        ...base,
+        id,
+        name: base.isRest ? '临时班次' : base.name,
+        time: `${startTime}-${endTime}`,
+        isRest: false,
+        temporary: true,
+      })
+      this.shifts = this.shifts.concat([temporaryShift])
+      this.$set(row.shifts, targetDateKey, id)
+      this.shiftPickerVisible = false
+      this.$message.success(`已临时修改 ${row.name} ${date} 的上下班时间`)
+      return true
     },
     resetShiftPicker() {
       document.removeEventListener('mousedown', this.onShiftPickerOutside, true)
@@ -746,6 +943,7 @@ export default {
       this.shiftPickerKeyword = ''
       this.selectedPickerShiftIds = []
       this.shiftPickerTab = 'day'
+      this.shiftPickerCycleApplyAll = false
       document.documentElement.style.removeProperty('--shift-picker-left')
       document.documentElement.style.removeProperty('--shift-picker-top')
       const wrapper = document.querySelector('.shift-picker-wrapper')
@@ -759,26 +957,40 @@ export default {
         this.shiftPickerVisible = false
         return
       }
-      const { row, dateKey } = this.shiftPickerTarget
-      if (!this.selectedPickerShiftIds.length) {
-        this.$set(row.shifts, dateKey, '休')
-        this.shiftPickerVisible = false
-        this.$message.success(`已将 ${row.name} 的班次清空为休息`)
+      if (this.shiftPickerTab === 'temporary') {
+        this.saveTemporaryShift()
         return
       }
-      const nextId = this.selectedPickerShiftIds[0]
-      const shift = this.shifts.find((item) => item.id === nextId)
-      const stored = shift && shift.isRest ? '休' : nextId
-      this.$set(row.shifts, dateKey, stored)
+      if (this.shiftPickerTab === 'cycle') {
+        const { row, dateKey } = this.shiftPickerTarget
+        const nextId = this.selectedPickerShiftIds[0] || null
+        const stored = this.resolvePickerShiftStored(nextId)
+        if (this.shiftPickerCycleApplyAll) {
+          const startIndex = this.displayDates.findIndex((date) => date.key === dateKey)
+          this.displayDates.slice(Math.max(0, startIndex)).forEach((date) => {
+            this.$set(row.shifts, date.key, stored)
+          })
+        }
+        const label = stored === '休' ? '休息' : this.shiftName(stored)
+        this.shiftPickerVisible = false
+        this.$message.success(this.shiftPickerCycleApplyAll
+          ? `已从当前日期起将 ${row.name} 的班次应用为 ${label}`
+          : `已保留 ${row.name} 当前日期的排班`)
+        return
+      }
+      const { row } = this.shiftPickerTarget
+      const nextId = this.selectedPickerShiftIds[0] || null
+      const stored = this.resolvePickerShiftStored(nextId)
+      const label = stored === '休' ? '休息' : this.shiftName(stored)
       this.shiftPickerVisible = false
-      this.$message.success(`已将 ${row.name} 的班次替换为 ${shift ? shift.name : stored}`)
+      this.$message.success(`已将 ${row.name} 的班次替换为 ${label}`)
     },
     saveAutoConfig() {
       this.autoDialogVisible = false
       this.$message.success('自动排班配置已保存')
     },
     publishSchedule() {
-      this.$confirm('发布后将同步至排班总览，确定发布吗？', '发布班表', {
+      this.$confirm('发布后将同步至排班倒班，确定发布吗？', '发布班表', {
         type: 'warning',
         customClass: 'publish-confirm-box',
         confirmButtonText: '确定',
@@ -786,8 +998,8 @@ export default {
         closeOnClickModal: false,
       })
         .then(() => {
-          this.$message.success('班表已发布，已进入排班总览')
-          this.openOverview()
+          this.$message.success('班表已发布，已进入排班倒班')
+          this.openScheduleIntl()
         })
         .catch(() => {})
     },

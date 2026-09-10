@@ -1,0 +1,116 @@
+/* 新增/编辑轮班规则的逐日班次选择，仅作用于轮班抽屉及其 body popover。 */
+.zn-add-rotation-drawer .zn-rotation-board__body .el-popover__reference-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.zn-add-rotation-drawer .zn-rotation-board__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.zn-add-rotation-drawer .zn-rotation-board__choose {
+  color: #3c6ef0;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.zn-add-rotation-drawer .zn-rotation-board__shift-card.overview-shift-chip.is-regular {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 40px;
+  height: 40px;
+  margin: 0;
+}
+
+.zn-rotation-day-popper.el-popover {
+  width: min(560px, calc(100vw - 32px)) !important;
+  max-width: calc(100vw - 32px);
+  padding: 16px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(35, 37, 43, .16);
+}
+
+.zn-rotation-day-popper .zn-rotation-day-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 24px;
+  box-sizing: border-box;
+  max-width: calc(100vw - 64px);
+  max-height: 360px;
+  padding: 1px;
+  overflow: auto;
+}
+
+.zn-rotation-day-popper .zn-rotation-day-picker__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.zn-rotation-day-popper .zn-rotation-day-picker__check {
+  display: inline-flex;
+  flex: 0 0 16px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #fff;
+  color: transparent;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.zn-rotation-day-popper .shift-picker-chip {
+  flex: 0 0 148px;
+  width: 148px;
+  min-width: 148px;
+  max-width: 148px;
+  min-height: 40px;
+  height: 40px;
+}
+.zn-add-rotation-drawer .zn-rotation-board__shift-card b,
+.zn-add-rotation-drawer .zn-rotation-board__shift-card small,
+.zn-rotation-day-popper .shift-picker-chip b,
+.zn-rotation-day-popper .shift-picker-chip small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zn-rotation-day-popper .zn-rotation-day-picker__option.is-selected .zn-rotation-day-picker__check {
+  border-color: #3c6ef0;
+  background: #3c6ef0;
+  color: #fff;
+}
+
+.zn-rotation-day-popper .zn-rotation-day-picker__option.is-selected .shift-picker-chip {
+  box-shadow: inset 0 0 0 1px var(--shift-selected-border, currentColor);
+}

@@ -1,0 +1,5 @@
+node_modules
+dist/
+.preview-logs/
+.DS_Store
+*.log

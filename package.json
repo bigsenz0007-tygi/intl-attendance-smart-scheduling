@@ -7,8 +7,9 @@
     "serve:monitor": "vue-cli-service serve --host 127.0.0.1 --port 4181",
     "preview": "node preview-server.js",
     "preview:monitor": "node preview-monitor-server.js",
-    "build": "vue-cli-service build",
-    "build:pages": "VUE_APP_PUBLIC_PATH=/intl-attendance-smart-scheduling/ vue-cli-service build"
+    "check:styles": "node scripts/check-style-scope.cjs",
+    "build": "npm run check:styles && vue-cli-service build",
+    "build:pages": "npm run check:styles && VUE_APP_PUBLIC_PATH=/intl-attendance-smart-scheduling/ vue-cli-service build"
   },
   "dependencies": {
     "@lui/lui-ui": "2.15.27",

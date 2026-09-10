@@ -206,7 +206,7 @@ export default {
   min-height: 0;
   max-height: 100%;
   height: auto;
-  color: #333;
+  color: #525765;
   background: transparent;
   font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 }
@@ -218,7 +218,7 @@ export default {
   max-height: 100%;
   height: fit-content;
   overflow: hidden;
-  border: 1px solid #e8e8e8;
+  border: 1px solid #f1f2f4;
   border-radius: 8px;
   background: #fff;
 }
@@ -226,26 +226,26 @@ export default {
   flex: 0 1 auto;
   min-height: 0;
   max-height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: auto;
+  overscroll-behavior: contain;
   border: 0;
   border-radius: 0;
   background: #fff;
 }
-.forecast-table { width: 100%; min-width: 0; border-collapse: separate; border-spacing: 0; table-layout: fixed; color: #333; font-size: 14px; font-weight: 400; line-height: 20px; }
-.forecast-table th, .forecast-table td { height: 48px; padding: 8px 12px; border-right: 1px solid #e8e8e8; border-bottom: 1px solid #e8e8e8; text-align: center; vertical-align: middle; box-sizing: border-box; }
+.forecast-table { width: 100%; min-width: 0; border-collapse: separate; border-spacing: 0; table-layout: fixed; color: #525765; font-size: 14px; font-weight: 400; line-height: 20px; }
+.forecast-table th, .forecast-table td { height: 48px; padding: 8px 12px; border-right: 1px solid #f1f2f4; border-bottom: 1px solid #f1f2f4; text-align: center; vertical-align: middle; box-sizing: border-box; }
 .forecast-table tr:last-child th, .forecast-table tr:last-child td { border-bottom: 0; }
 .forecast-table th:last-child, .forecast-table td:last-child { border-right: 0; }
 .forecast-table thead th {
   position: sticky;
   top: 0;
   z-index: 10;
-  height: 56px;
+  height: 48px;
   padding: 8px 12px;
   color: #525765;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid #f1f2f4;
   /* 必须实色：半透明会让下方「单量」数字透进表头叠字 */
-  background: #eef2fc;
+  background: #f5f5f6;
   box-shadow: none;
   font-size: 14px;
   font-weight: 500;
@@ -254,11 +254,11 @@ export default {
 }
 .forecast-table thead th.group-col {
   z-index: 11;
-  background: #eef2fc;
+  background: #f5f5f6;
 }
 .forecast-table thead th.date-col {
   padding: 8px 12px;
-  background: #eef2fc;
+  background: #f5f5f6;
 }
 .forecast-table thead th.date-col strong,
 .forecast-table thead th.date-col span {
@@ -271,7 +271,7 @@ export default {
 }
 .forecast-table tbody tr:first-child th,
 .forecast-table tbody tr:first-child td {
-  border-top: 1px solid #e8e8e8;
+  border-top: 1px solid #f1f2f4;
   box-shadow: none;
 }
 .forecast-table tbody th { color: #525765; background: #fff; font-size: 14px; font-weight: 400; line-height: 20px; text-align: center; }
@@ -367,7 +367,7 @@ export default {
 }
 .forecast-table tbody tr.forecast-editable-row:hover .editable-value:not(.is-limit-error) ::v-deep .el-input__inner,
 .forecast-table tbody tr.forecast-editable-row.is-editing:not(.is-active) .editable-value:not(.is-limit-error) ::v-deep .el-input__inner {
-  border-color: #d9d9d9 !important;
+  border-color: #f1f2f4 !important;
   border-radius: 8px;
   background: #fff;
   box-shadow: none !important;

@@ -1,0 +1,78 @@
+/* 添加员工：第一步表格左对齐；第二步按员工拆分为独立表格模块。 */
+.zn-add-employee-drawer {
+  .zn-form-drawer__table th,
+  .zn-form-drawer__table td,
+  .zn-form-drawer__table th .cell,
+  .zn-form-drawer__table td .cell { text-align: left !important; }
+  .zn-form-drawer__table th:not(.is-selection) .cell,
+  .zn-form-drawer__table td:not(.is-selection) .cell { display: block; padding: 0 !important; }
+  .zn-form-drawer__table th.is-selection,
+  .zn-form-drawer__table td.is-selection,
+  .zn-form-drawer__table th.el-table-column--selection,
+  .zn-form-drawer__table td.el-table-column--selection { padding: 0 !important; text-align: center !important; }
+  .zn-form-drawer__table th.is-selection .cell,
+  .zn-form-drawer__table td.is-selection .cell,
+  .zn-form-drawer__table .el-table-column--selection .cell { justify-content: center; text-align: center !important; }
+  .zn-form-drawer__table tbody tr.is-existing-employee > td,
+  .zn-form-drawer__table tbody tr.is-existing-employee:hover > td {
+    color: #aeb3be !important;
+    background: #f5f5f6 !important;
+    cursor: not-allowed;
+  }
+  .zn-form-drawer__table tbody tr.is-existing-employee > td .cell { color: #aeb3be !important; }
+  .zn-form-drawer__table tbody tr.is-existing-employee .el-checkbox__inner {
+    border-color: #d9d9d9 !important;
+    background: #f0f1f3 !important;
+  }
+  .zn-form-drawer__table .el-table__empty-block { width: 100% !important; min-height: 240px; }
+  .zn-add-employee-empty-state { display: flex; min-height: 240px; flex-direction: column; align-items: center; justify-content: center; color: #868d9f; }
+  .zn-add-employee-empty-state__illustration { position: relative; display: block; width: 50px; height: 40px; }
+  .zn-add-employee-empty-state__shadow { position: absolute; right: 0; bottom: 0; left: 0; width: 50px; height: 16px; }
+  .zn-add-employee-empty-state__doc { position: absolute; top: 0; left: 7px; width: 36px; height: 30px; }
+  .zn-add-employee-empty-state p { margin: 8px 0 0; color: #868d9f; font-size: 14px; line-height: 22px; }
+
+  .zn-add-employee-config-list { display: flex; flex: 1 1 auto; min-height: 0; flex-direction: column; gap: 16px; overflow-x: hidden; overflow-y: auto; padding-right: 2px; }
+  .zn-add-employee-config-card { flex: 0 0 auto; box-sizing: border-box; padding: 0; overflow: hidden; border: 1px solid #eaeaea; border-radius: 8px; background: #fff; }
+  .zn-add-employee-config-table { display: block; box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; overscroll-behavior: contain; touch-action: pan-x; background: #fff; }
+  .zn-add-employee-config-table__grid { display: grid; grid-template-columns: 112px 142px 96px 172px 92px 92px; align-items: center; justify-content: start; gap: 24px; box-sizing: border-box; width: max-content; min-width: 100%; padding-right: 16px; padding-left: 16px; }
+  .zn-add-employee-config-table__head { min-height: 40px; border-bottom: 1px solid #eaeaea; color: #23252b; background: #f5f5f6; font-size: 14px; font-weight: 500; line-height: 20px; text-align: left; }
+  .zn-add-employee-config-card__controls { min-height: 64px; padding-top: 8px; padding-bottom: 8px; }
+  .zn-add-employee-config-control { min-width: 0; }
+  .zn-add-employee-config-control .el-select,
+  .zn-add-employee-config-control .el-date-editor,
+  .zn-add-employee-config-control .el-input { width: 100%; }
+  .zn-add-employee-config-person { display: flex; min-width: 0; height: 40px; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; }
+  .zn-add-employee-config-person strong { max-width: 100%; overflow: hidden; color: #23252b; font-size: 14px; font-weight: 500; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+  .zn-add-employee-config-person span { max-width: 100%; overflow: hidden; color: #868d9f; font-size: 12px; line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+  .zn-add-employee-number-field { display: grid; grid-template-columns: minmax(0, 1fr) 16px; align-items: center; gap: 4px; min-width: 0; }
+  .zn-add-employee-number-field > span { color: #525765; font-size: 14px; line-height: 20px; }
+  .zn-add-employee-number-field .el-input__inner { padding-right: 8px; padding-left: 8px; text-align: left; }
+  .zn-add-employee-schedule-trigger { display: flex; align-items: center; box-sizing: border-box; width: 100%; min-width: 0; height: 40px; padding: 0; overflow: hidden; border: 0; border-radius: 8px; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+  .zn-add-employee-schedule-trigger .shift-picker-chip { width: 148px; min-width: 148px; max-width: 148px; height: 40px; min-height: 40px; }
+  .zn-add-employee-config-empty { display: flex; align-items: center; box-sizing: border-box; width: 100%; height: 32px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 8px; color: #3c6ef0; font-size: 14px; line-height: 30px; }
+
+  .zn-add-employee-period-preview { position: relative; margin: 0; padding: 16px; border-top: 1px solid #eaeaea; }
+  .zn-add-employee-day-editor-anchor { position: absolute; top: 16px; display: block; width: 1px; height: 1px; pointer-events: none; }
+  .zn-add-employee-period-preview__scroll { max-width: 100%; overflow-x: auto; overflow-y: hidden; border: 1px solid #eaeaea; border-radius: 8px; }
+  .zn-add-employee-period-preview__track { display: flex; width: max-content; min-width: 100%; }
+  .zn-add-employee-period-day { position: relative; flex: 0 0 calc(914px / 14); min-width: 0; box-sizing: border-box; border-right: 1px solid #eaeaea; cursor: pointer; user-select: none; }
+  .zn-add-employee-period-day:last-child { border-right: 0; }
+  .zn-add-employee-period-day__head { display: flex; height: 40px; flex-direction: column; align-items: center; justify-content: center; color: #525765; background: #f5f5f6; font-size: 12px; line-height: 16px; }
+  .zn-add-employee-period-day__head strong { font-size: 12px; font-weight: 500; }
+  .zn-add-employee-period-day__body { display: flex; height: 52px; align-items: center; justify-content: center; box-sizing: border-box; padding: 4px; }
+  .zn-add-employee-period-day__rest { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 40px; border-radius: 8px; color: #525765; background: #f5f5f6; font-size: 14px; }
+  .zn-add-employee-period-day__shift.overview-shift-chip.is-regular { width: 100%; min-width: 0; height: 40px; min-height: 40px; margin: 0; padding: 6px 8px; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; }
+  .zn-add-employee-period-day__shift b { max-width: 100%; overflow: hidden; font-size: 12px; line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+
+}
+
+/* 与新增轮班规则中的班次选择器保持同宽、同列数、同间距和同选中态。 */
+.zn-add-employee-shift-popper.el-popover { width: min(560px, calc(100vw - 32px)) !important; max-width: calc(100vw - 32px); padding: 16px; overflow: hidden; border: 0; border-radius: 8px; box-shadow: 0 4px 16px rgba(35, 37, 43, .16); }
+.zn-add-employee-shift-popper .zn-add-employee-shift-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 24px; box-sizing: border-box; max-width: calc(100vw - 64px); max-height: 360px; padding: 1px; overflow: auto; }
+.zn-add-employee-shift-popper .zn-add-employee-shift-picker__option { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; padding: 0; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.zn-add-employee-shift-popper .zn-add-employee-shift-picker__check { display: inline-flex; flex: 0 0 16px; align-items: center; justify-content: center; box-sizing: border-box; width: 16px; height: 16px; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: transparent; font-size: 12px; line-height: 14px; }
+.zn-add-employee-shift-popper .zn-add-employee-shift-picker__option .shift-picker-chip { flex: 0 0 148px; width: 148px; min-width: 148px; max-width: 148px; height: 40px; min-height: 40px; }
+.zn-add-employee-shift-popper .zn-add-employee-shift-picker__option .shift-picker-chip b,
+.zn-add-employee-shift-popper .zn-add-employee-shift-picker__option .shift-picker-chip small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.zn-add-employee-shift-popper .zn-add-employee-shift-picker__option.is-selected .zn-add-employee-shift-picker__check { border-color: #3c6ef0; background: #3c6ef0; color: #fff; }
+.zn-add-employee-shift-popper .zn-add-employee-shift-picker__option.is-selected .shift-picker-chip { box-shadow: inset 0 0 0 1px var(--shift-selected-border, currentColor); }

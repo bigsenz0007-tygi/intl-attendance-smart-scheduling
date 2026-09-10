@@ -3,40 +3,34 @@
     <header class="topbar">
       <div class="brand">
         <div class="brand-logo-group">
-          <img class="brand-logo-mark" :src="jdlMark" alt="JDL" width="53" height="24">
-          <span class="brand-company">京东物流</span>
+          <img class="brand-logo-mark brand-logo-combined" :src="brandLogo" alt="京东物流" width="120" height="20">
         </div>
-        <span class="brand-divider"></span>
-        <strong class="brand-title">国际考勤</strong>
+        <strong class="brand-title">考勤管理</strong>
       </div>
       <div class="topbar-actions">
-        <span><i class="el-icon-question"></i>【帮助中心】</span>
-        <span><i class="el-icon-chat-dot-round"></i>【上线公告】</span>
-        <span><i class="el-icon-refresh"></i>【权限刷新】</span>
-        <span class="avatar">AM</span>
-        <span>Amy Miller <i class="el-icon-arrow-down"></i></span>
+        <div class="topbar-tools">
+          <button type="button" class="topbar-tool" title="帮助中心" aria-label="帮助中心">
+            <shell-icon name="help" />
+          </button>
+          <button type="button" class="topbar-tool" title="上线公告" aria-label="上线公告">
+            <shell-icon name="notice" />
+          </button>
+          <button type="button" class="topbar-tool" title="权限刷新" aria-label="权限刷新">
+            <shell-icon name="refresh" />
+          </button>
+        </div>
+        <div class="topbar-user">
+          <span class="avatar">AM</span>
+          <span class="topbar-user__name">Amy Miller</span>
+          <shell-icon class="topbar-user__arrow" name="arrowDown" />
+        </div>
       </div>
     </header>
 
-    <aside class="sidebar">
-      <div class="nav-group">
-        <div
-          v-for="item in navItems"
-          :key="item.label"
-          class="nav-item"
-          :class="{ active: item.active }"
-        >
-          <i :class="item.icon"></i><span>{{ item.label }}</span><i v-if="item.expand" class="el-icon-arrow-down nav-arrow"></i>
-        </div>
-      </div>
-      <div class="sidebar-foot"><i class="el-icon-s-fold"></i><span>收起菜单</span></div>
-    </aside>
+    <AppSidebar view-mode="monitor" @navigate="onMonitorNav" />
 
     <main class="workspace">
-      <div class="page-tabs">
-        <span class="page-tab-home">首页</span>
-        <span class="page-tab-active">排班监控中心 <i class="el-icon-close"></i></span>
-      </div>
+      <AppQuickMenuTabs active-title="排班监控中心" />
 
       <section class="monitor-page">
         <!-- 查询区：仅部门 + 时间，重置/查询靠右 -->
@@ -209,9 +203,11 @@
 </template>
 
 <script>
-import jdlMark from '../assets/jdl-mark.svg'
 import { assetUrl } from '../utils/assetUrl'
 import TrendChart from './components/TrendChart.vue'
+import AppSidebar from '../components/shell/AppSidebar.vue'
+import AppQuickMenuTabs from '../components/shell/AppQuickMenuTabs.vue'
+import ShellIcon from '../components/shell/ShellIcon.vue'
 import {
   departmentOptions,
   kpiMetrics,
@@ -230,12 +226,12 @@ function easeOutCubic(t) {
 
 export default {
   name: 'ScheduleMonitorApp',
-  components: { TrendChart },
+  components: { TrendChart, AppSidebar, AppQuickMenuTabs, ShellIcon },
   data() {
     const [start, end] = DEFAULT_DATE_RANGE
     const series = buildMonitorByRange(start, end)
     return {
-      jdlMark,
+      brandLogo: assetUrl('shell/jdl-logo-combined.svg'),
       departmentOptions,
       kpiMetrics: kpiMetrics.map((item) => ({
         ...item,
@@ -251,20 +247,6 @@ export default {
       dateRange: [...DEFAULT_DATE_RANGE],
       filterError: false,
       _kpiAnimFrame: null,
-      navItems: [
-        { label: '首页', icon: 'el-icon-house' },
-        { label: '用户管理', icon: 'el-icon-user', expand: true },
-        { label: '考勤组管理', icon: 'el-icon-s-custom' },
-        { label: '基础配置', icon: 'el-icon-setting', expand: true },
-        { label: '排班管理', icon: 'el-icon-date', expand: true },
-        { label: '排班总览', icon: 'el-icon-s-grid' },
-        { label: '新建排班', icon: 'el-icon-magic-stick' },
-        { label: '排班监控', icon: 'el-icon-data-line', active: true },
-        { label: '异常管理', icon: 'el-icon-warning-outline' },
-        { label: '报表管理', icon: 'el-icon-document' },
-        { label: '我的流程', icon: 'el-icon-tickets' },
-        { label: '数据看板', icon: 'el-icon-data-analysis', expand: true },
-      ],
     }
   },
   computed: {
@@ -283,6 +265,7 @@ export default {
   },
   methods: {
     assetUrl,
+    onMonitorNav() {},
     cancelKpiAnimation() {
       if (this._kpiAnimFrame != null) {
         cancelAnimationFrame(this._kpiAnimFrame)

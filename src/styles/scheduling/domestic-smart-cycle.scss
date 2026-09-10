@@ -1,0 +1,158 @@
+.domestic-smart-cycle-shift-card {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 148px;
+  width: 148px;
+  min-width: 148px;
+  max-width: 148px;
+  height: 40px;
+  min-height: 40px;
+  padding: 3px 10px;
+  overflow: hidden;
+  border: 1px solid var(--cycle-shift-border, transparent);
+  border-radius: 8px;
+  background: var(--cycle-shift-bg, #f5f5f6);
+  color: var(--cycle-shift-color, #525765);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+/* 与排班倒班页的班次豆腐块保持 148px 等宽、40px 等高。 */
+.domestic-smart-cycle-shift-card.is-empty {
+  align-items: center;
+  justify-content: center;
+  border-color: rgba(60, 110, 240, 0.35);
+  background: transparent;
+}
+
+.domestic-smart-cycle-shift-card__placeholder {
+  color: #3c6ef0;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.domestic-smart-cycle-popper.el-select-dropdown {
+  width: min(560px, calc(100vw - 32px)) !important;
+}
+
+.domestic-smart-cycle-popper .el-select-dropdown__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 24px;
+  padding: 8px;
+}
+
+.domestic-smart-cycle-popper .el-select-dropdown__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  padding: 0;
+}
+
+.domestic-smart-cycle-popper .zn-rotation-option-card {
+  flex: 1 1 0;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 40px;
+  height: 40px;
+  border: 1px solid transparent;
+}
+
+.domestic-smart-cycle-option-check {
+  display: inline-flex;
+  flex: 0 0 16px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  align-self: center;
+  margin-top: 0;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #fff;
+  color: transparent;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.domestic-smart-cycle-popper .el-select-dropdown__item.selected .domestic-smart-cycle-option-check {
+  border-color: #3c6ef0;
+  background: #3c6ef0;
+  color: #fff;
+}
+
+.domestic-smart-cycle-popper .el-select-dropdown__item.selected .zn-rotation-option-card {
+  border-color: var(--cycle-shift-selected-border, var(--cycle-shift-border));
+  box-shadow: none;
+}
+
+.overseas-select-popper.domestic-smart-cycle-popper .el-select-dropdown__item.selected,
+.overseas-select-popper.domestic-smart-cycle-popper .el-select-dropdown__item.selected.hover,
+.overseas-select-popper.domestic-smart-cycle-popper .el-select-dropdown__item.selected:hover {
+  background: transparent !important;
+}
+
+.domestic-smart-cycle-shift-card:focus-within {
+  box-shadow: 0 0 0 2px rgba(60, 110, 240, .24);
+}
+
+.domestic-smart-cycle-shift-card__label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+  color: inherit;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.domestic-smart-cycle-shift-card__label strong,
+.domestic-smart-cycle-shift-card__label span {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: inherit;
+  font-size: 12px;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.domestic-smart-cycle-shift-card__label strong {
+  font-weight: 500;
+}
+
+.domestic-smart-cycle-shift {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100% !important;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.domestic-smart-cycle-seg__row .domestic-smart-cycle-icon.is-seg-remove {
+  margin-left: auto;
+  margin-right: 6px;
+}
+
+.domestic-smart-cycle-seg__row.has-empty-shift {
+  position: relative;
+  justify-content: center;
+}
+
+.domestic-smart-cycle-seg__row.has-empty-shift .domestic-smart-cycle-icon.is-seg-remove {
+  position: absolute;
+  right: 6px;
+  margin-left: 0;
+  margin-right: 0;
+}
