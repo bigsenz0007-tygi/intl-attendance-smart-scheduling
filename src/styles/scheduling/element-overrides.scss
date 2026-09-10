@@ -287,6 +287,14 @@ body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-opti
   border-radius: 8px;
 }
 
+/* 顶部班次图例恢复既定宽度；轮班及其他班次选择器保持原尺寸。 */
+.overseas-schedule-root .overview-legend-block .legend-chip--shift {
+  flex-basis: 142px !important;
+  width: 142px !important;
+  min-width: 142px !important;
+  max-width: 142px !important;
+}
+
 .overseas-schedule-root .overview-legend-block .legend-chip b,
 .overseas-schedule-root .overview-legend-block .legend-chip small,
 .overseas-schedule-root .domestic-smart-shift-chip b,
