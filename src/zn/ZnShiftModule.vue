@@ -81,7 +81,7 @@
                 <el-button type="primary" class="btn-smart-schedule" @click="onSmartScheduleClick">
                   <img
                     class="btn-smart-schedule__icon"
-                    src="/assets/smart-schedule/ai-icon-data2.png"
+                    :src="assetUrl('smart-schedule/ai-icon-data2.png')"
                     alt=""
                     width="16"
                     height="16"
@@ -393,7 +393,7 @@
         <div class="zn-newcomer-tip__main">
           <img
             class="zn-newcomer-tip__icon"
-            src="/assets/lui/icon-hint-solid.svg"
+            :src="assetUrl('lui/icon-hint-solid.svg')"
             alt=""
             width="16"
             height="16"
@@ -452,7 +452,7 @@
           <div class="zn-cycle-dialog__head-meta-left">
             <div class="zn-cycle-rule-toast-slot" :class="{ 'is-active': !!publishRuleToast }">
               <div v-show="publishRuleToast" class="zn-cycle-rule-toast" role="alert">
-                <img class="zn-cycle-rule-toast__icon" src="/assets/lui/icon-hint-solid.svg" alt="" width="16" height="16" />
+                <img class="zn-cycle-rule-toast__icon" :src="assetUrl('lui/icon-hint-solid.svg')" alt="" width="16" height="16" />
                 <span>{{ publishRuleToast }}</span>
               </div>
             </div>
