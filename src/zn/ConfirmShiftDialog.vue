@@ -854,7 +854,6 @@ export default {
       const confirmed = cloneRows(this.rows).map((row) => ({ ...row, isNew: false }))
       this.$emit('confirm', confirmed)
       this.innerVisible = false
-      this.$message.success(`已确认 ${confirmed.length} 个班次`)
     },
   },
 }

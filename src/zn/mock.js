@@ -256,7 +256,7 @@ export function resizePatternLoop(pattern, targetDays) {
   return result
 }
 
-function fillShifts(pattern, dates, offset = 0) {
+function fillShifts(pattern, dates, offset = 0, startDate = '') {
   const shifts = {}
   if (!pattern.length) {
     dates.forEach((date) => {
@@ -265,9 +265,12 @@ function fillShifts(pattern, dates, offset = 0) {
     return shifts
   }
   const len = Math.max(1, pattern.length)
+  let scheduledIndex = 0
   dates.forEach((date, i) => {
-    const idx = (i + offset) % len
+    if (startDate && date.fullKey < startDate) { shifts[date.key] = 'EMPTY'; return }
+    const idx = ((startDate ? scheduledIndex : i) + offset) % len
     shifts[date.key] = pattern[idx]
+    scheduledIndex += 1
   })
   return shifts
 }
@@ -314,7 +317,7 @@ export function applyConfigsToBoard(configs, dates = ZN_DATES) {
       const rawDays = Number(emp.cycleDays)
       const cycleDays = Number.isFinite(rawDays) ? Math.max(0, Math.trunc(rawDays)) : 7
       const pattern = cycleDays === 0 ? [] : emp.pattern.slice(0, cycleDays)
-      const shifts = fillShifts(pattern, dates, offset)
+      const shifts = fillShifts(pattern, dates, emp.scheduleStartDate ? 0 : offset, emp.scheduleStartDate)
       return {
         id: emp.id,
         name: emp.name,

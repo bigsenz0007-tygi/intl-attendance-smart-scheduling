@@ -268,18 +268,21 @@ body:has(.overseas-schedule-root) .zn-operation-help-dialog .zn-help-rule__type 
   line-height: 22px;
 }
 
-/* Shift/rotation tofu contract: normal cards are always 148 × 40. */
+/* Shift/rotation tofu contract: shared geometry and truncation across every surface. */
 .overseas-schedule-root .overview-legend-block .legend-chip,
+.overseas-schedule-root .zn-shift-module .overview-matrix.density-normal .overview-shift-chip.is-regular,
+.overseas-schedule-root .zn-shift-module .overview-matrix.density-normal .rest-cell,
+.overseas-schedule-root .zn-shift-module .overview-matrix.density-compact .overview-shift-chip.is-compact,
+.overseas-schedule-root .zn-shift-module .overview-matrix.density-compact .rest-cell,
 .overseas-schedule-root .domestic-smart-shift-chip,
 .overseas-schedule-root .zn-stat-shift-tag,
 body:has(.overseas-schedule-root) .shift-picker-dialog.is-day .shift-picker-chip,
 body:has(.overseas-schedule-root) .zn-rotation-day-popper .shift-picker-chip,
-body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-option-card {
+body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-option-card,
+.overseas-schedule-root .domestic-smart-cycle-shift-card {
   box-sizing: border-box;
-  flex: 0 0 148px !important;
-  width: 148px !important;
-  min-width: 148px !important;
-  max-width: 148px !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
   height: 40px !important;
   min-height: 40px !important;
   max-height: 40px !important;
@@ -287,12 +290,37 @@ body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-opti
   border-radius: 8px;
 }
 
-/* 顶部班次图例恢复既定宽度；轮班及其他班次选择器保持原尺寸。 */
-.overseas-schedule-root .overview-legend-block .legend-chip--shift {
-  flex-basis: 142px !important;
-  width: 142px !important;
-  min-width: 142px !important;
-  max-width: 142px !important;
+/* 常规班次/轮班豆腐块统一尺寸，容器不足时在卡片内截断。 */
+.overseas-schedule-root .overview-legend-block .legend-chip,
+.overseas-schedule-root .zn-shift-module .overview-matrix.density-normal .overview-shift-chip.is-regular,
+.overseas-schedule-root .zn-shift-module .overview-matrix.density-normal .rest-cell,
+.overseas-schedule-root .domestic-smart-shift-chip,
+.overseas-schedule-root .zn-stat-shift-tag,
+body:has(.overseas-schedule-root) .shift-picker-dialog.is-day .shift-picker-chip,
+body:has(.overseas-schedule-root) .zn-rotation-day-popper .shift-picker-chip,
+body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-option-card,
+.overseas-schedule-root .domestic-smart-cycle-shift-card:not(.is-empty) {
+  flex: 0 0 94px !important;
+  width: 94px !important;
+  min-width: 94px !important;
+  max-width: 94px !important;
+}
+
+/* 精简主表统一为 36x40；常规和各选择器统一为 94x40，圆角均为 8px。 */
+.overseas-schedule-root .zn-shift-module .overview-matrix.density-compact .overview-shift-chip.is-compact,
+.overseas-schedule-root .zn-shift-module .overview-matrix.density-compact .rest-cell {
+  flex: 0 0 36px !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+}
+
+/* 固定宽度内优先保证休息时间完整显示。 */
+body:has(.overseas-schedule-root) .shift-picker-chip.is-rest,
+body:has(.overseas-schedule-root) .shift-picker-chip[title^='休息 '],
+body:has(.overseas-schedule-root) .zn-rotation-option-card[title^='休息 '] {
+  padding-right: 9px;
+  padding-left: 9px;
 }
 
 .overseas-schedule-root .overview-legend-block .legend-chip b,
@@ -306,7 +334,9 @@ body:has(.overseas-schedule-root) .shift-picker-dialog.is-day .shift-picker-chip
 body:has(.overseas-schedule-root) .zn-rotation-day-popper .shift-picker-chip b,
 body:has(.overseas-schedule-root) .zn-rotation-day-popper .shift-picker-chip small,
 body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-option-card strong,
-body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-option-card span {
+body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-option-card span,
+.overseas-schedule-root .domestic-smart-cycle-shift-card__label strong,
+.overseas-schedule-root .domestic-smart-cycle-shift-card__label span {
   display: block;
   width: 100%;
   max-width: 100%;
@@ -315,9 +345,71 @@ body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .zn-rotation-opti
   white-space: nowrap;
 }
 
-/* Three fixed cards plus checkbox columns and 24px gaps must fit without clipping. */
+.overseas-schedule-root .zn-shift-module .overview-matrix:not(.zn-cycle-matrix) tbody tr:not(.zn-schedule-empty-row) > td {
+  border-bottom: 1px solid #e4e5e9;
+}
+
+.overseas-schedule-root .zn-shift-module .overview-matrix .overview-schedule-summary-row > th {
+  top: 48px;
+  height: 64px;
+  padding: 6px 4px;
+  border-bottom-color: #e4e5e9;
+  background: #fafafb;
+}
+
+.overseas-schedule-root .zn-shift-module .overview-matrix .overview-schedule-summary-row > th.overview-schedule-summary-label {
+  padding-left: 8px;
+  color: #525765;
+  text-align: left;
+}
+
+.overseas-schedule-root .zn-shift-module .overview-matrix .overview-schedule-summary-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  text-align: left;
+}
+
+.overseas-schedule-root .zn-shift-module .overview-matrix .overview-schedule-summary-stack > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.overseas-schedule-root .zn-shift-module .overview-matrix .overview-schedule-summary-stack > span > em {
+  color: #525765;
+  font-style: normal;
+}
+
+.overseas-schedule-root .zn-shift-module .overview-matrix .overview-schedule-summary-stack > span > b {
+  color: #23252b;
+  font-weight: 400;
+}
+
+.overseas-schedule-root .zn-shift-module .overview-matrix.density-normal .overview-schedule-summary-cell .overview-schedule-summary-stack {
+  box-sizing: border-box;
+  width: 100%;
+  padding-left: 14px;
+}
+
+body:has(.overseas-schedule-root) .zn-schedule-filter__group--inline {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 24px;
+}
+
+/* 所有班次/轮班选择器统一为608px三列布局。 */
 body:has(.overseas-schedule-root) .shift-picker-dialog.is-day,
 body:has(.overseas-schedule-root) .zn-rotation-day-popper.el-popover,
+body:has(.overseas-schedule-root) .zn-add-employee-shift-popper.el-popover,
 body:has(.overseas-schedule-root) .domestic-smart-cycle-popper.el-select-dropdown {
   width: min(608px, calc(100vw - 32px)) !important;
   max-width: calc(100vw - 32px);
@@ -325,9 +417,11 @@ body:has(.overseas-schedule-root) .domestic-smart-cycle-popper.el-select-dropdow
 
 body:has(.overseas-schedule-root) .shift-picker-dialog.is-day .shift-picker-grid,
 body:has(.overseas-schedule-root) .zn-rotation-day-popper .zn-rotation-day-picker,
+body:has(.overseas-schedule-root) .zn-add-employee-shift-popper .zn-add-employee-shift-picker,
 body:has(.overseas-schedule-root) .domestic-smart-cycle-popper .el-select-dropdown__list {
-  grid-template-columns: repeat(3, 172px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   justify-content: start;
+  row-gap: 12px;
   column-gap: 24px;
 }
 
@@ -455,4 +549,33 @@ body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix tbody tr.is-r
 body:has(.overseas-schedule-root) .zn-cycle-matrix.overview-matrix tbody tr.is-rule-error-row > .overview-operation-cell .zn-cycle-copy-link {
   position: relative;
   z-index: 3;
+}
+
+/* 职能后线智能排班：逐行排期起始，按统一 32px 日期控件展示。 */
+body:has(.overseas-schedule-root) .zn-cycle-matrix .zn-cycle-col-start,
+body:has(.overseas-schedule-root) .zn-cycle-matrix .overview-start-col,
+body:has(.overseas-schedule-root) .zn-cycle-matrix .overview-start-cell {
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+  padding: 8px;
+  text-align: left;
+}
+
+body:has(.overseas-schedule-root) .zn-cycle-start-picker.el-date-editor.el-input {
+  width: 104px;
+}
+
+body:has(.overseas-schedule-root) .zn-cycle-start-picker .el-input__inner {
+  height: 32px;
+  padding: 0 28px 0 8px;
+  border-radius: 8px;
+  color: #23252b;
+  font-size: 14px;
+  line-height: 32px;
+  text-align: left;
+}
+
+body:has(.overseas-schedule-root) .zn-cycle-start-picker .el-input__icon {
+  line-height: 32px;
 }

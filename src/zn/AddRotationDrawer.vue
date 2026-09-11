@@ -17,13 +17,7 @@
         class="zn-form-drawer__form"
         @submit.native.prevent
       >
-        <div class="zn-form-drawer__grid zn-form-drawer__grid--3">
-          <el-form-item label="部门" required>
-            <el-input :value="departmentLabel" disabled />
-          </el-form-item>
-          <el-form-item label="考勤组">
-            <el-input :value="attendanceGroupLabel" disabled />
-          </el-form-item>
+        <div class="zn-form-drawer__grid">
           <el-form-item label="规则名称" required>
             <el-input v-model="form.name" placeholder="请输入名称，如作五休二" maxlength="40" />
           </el-form-item>
@@ -39,9 +33,6 @@
               />
               <span v-if="cycleDaysError" class="zn-rotation-days__error">{{ cycleDaysError }}</span>
             </div>
-          </el-form-item>
-          <el-form-item label="规则内容">
-            <el-input v-model="form.content" placeholder="请输入名称，如连续上6个早班休息一次" />
           </el-form-item>
         </div>
 
@@ -121,6 +112,8 @@
 </template>
 
 <script>
+import { resolveShiftSelectedBorder } from '../utils/shiftPalette'
+
 export default {
   name: 'AddRotationDrawer',
   props: {
@@ -217,7 +210,7 @@ export default {
       const background = shift.background || shift.light || '#e6edff'
       const color = shift.color || shift.textColor || '#3c6ef0'
       return {
-        '--shift-selected-border': color === '#FFFFFF' ? background : color,
+        '--shift-selected-border': resolveShiftSelectedBorder(shift),
         background,
         color,
       }

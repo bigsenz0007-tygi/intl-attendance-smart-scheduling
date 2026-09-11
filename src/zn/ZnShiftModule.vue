@@ -155,8 +155,9 @@
               @show="onFilterPopoverShow"
             >
               <div class="zn-schedule-filter">
-                <div class="zn-schedule-filter__group">
+                <div class="zn-schedule-filter__group zn-schedule-filter__group--inline">
                   <el-checkbox v-model="filterDraft.onlyUnscheduled">仅看未排班</el-checkbox>
+                  <el-checkbox v-model="filterDraft.showScheduleData">展示排班数据</el-checkbox>
                 </div>
                 <div class="zn-schedule-filter__group">
                   <div class="zn-schedule-filter__title">人员状态</div>
@@ -213,18 +214,17 @@
           <div class="overview-legend-row">
             <div class="legend">
               <strong>班次</strong>
+              <el-tooltip v-for="shift in legendShifts" :key="shift.id" :content="`${shift.name} ${formatShiftRange(shift.time)}`" :disabled="!legendChipNeedsTooltip(shift)" effect="dark" placement="top" popper-class="lui-pc-tooltip zn-shift-card-tooltip" :open-delay="150">
               <span
-                v-for="shift in legendShifts"
-                :key="shift.id"
                 class="legend-chip legend-chip--shift"
                 :class="{ 'is-rest': shift.isRest }"
                 :style="legendChipStyle(shift)"
-                :title="`${shift.name} ${formatShiftRange(shift.time)}（双击编辑班次）`"
+                :title="legendChipNeedsTooltip(shift) ? null : `${shift.name} ${formatShiftRange(shift.time)}`"
                 @dblclick.stop="editLegendShift(shift)"
               >
                 <b>{{ shift.name }}</b>
                 <small>{{ formatShiftRange(shift.time) }}</small>
-              </span>
+              </span></el-tooltip>
             </div>
           </div>
           <div
@@ -233,18 +233,17 @@
           >
             <div class="legend">
               <strong>轮班</strong>
+              <el-tooltip v-for="shift in rotations" :key="shift.id" :content="`${shift.name} ${formatShiftRange(shift.time)}`" :disabled="!legendChipNeedsTooltip(shift)" effect="dark" placement="top" popper-class="lui-pc-tooltip zn-shift-card-tooltip" :open-delay="150">
               <span
-                v-for="shift in rotations"
-                :key="shift.id"
                 class="legend-chip legend-chip--rotation"
                 :class="{ 'is-rest': shift.isRest }"
                 :style="rotationLegendStyle(shift)"
-                :title="`${shift.name} ${formatShiftRange(shift.time)}（双击编辑轮班）`"
+                :title="legendChipNeedsTooltip(shift) ? null : `${shift.name} ${formatShiftRange(shift.time)}`"
                 @dblclick.stop="editLegendRotation(shift)"
               >
-                <b>{{ shift.name.length > 5 ? `${shift.name.slice(0, 5)}...` : shift.name }}</b>
+                <b>{{ shift.name }}</b>
                 <small>{{ formatShiftRange(shift.time) }}</small>
-              </span>
+              </span></el-tooltip>
             </div>
           </div>
         </div>
@@ -269,7 +268,7 @@
                     />
                   </div>
                 </th>
-                <th class="overview-rest-col" aria-label="排休时间"><el-tooltip content="排休时间" placement="top" popper-class="lui-pc-tooltip"><i class="el-icon-time"></i></el-tooltip></th>
+                <th class="overview-rest-col" aria-label="排休">排休</th>
                 <th
                   v-for="date in dates"
                   :key="date.fullKey || date.key"
@@ -286,6 +285,16 @@
                           <template v-if="!date.isToday">{{ date.weekShort }}</template>
                           <em v-if="date.isToday" class="today-tag">今</em>
                     </span>
+                  </div>
+                </th>
+              </tr>
+              <tr v-if="filterApplied.showScheduleData" class="overview-schedule-summary-row">
+                <th colspan="2" class="overview-schedule-summary-label">排班数据</th>
+                <th v-for="date in dates" :key="`summary-${date.fullKey || date.key}`" class="overview-schedule-summary-cell">
+                  <div class="overview-schedule-summary-stack">
+                    <span><em>{{ viewDensity === 'compact' ? '班' : '班数' }}</em><b>{{ scheduleStatsByDate[date.key].shiftCount }}</b></span>
+                    <span><em>{{ viewDensity === 'compact' ? '休' : '休数' }}</em><b>{{ scheduleStatsByDate[date.key].restCount }}</b></span>
+                    <span><em>{{ viewDensity === 'compact' ? '空' : '空数' }}</em><b>{{ scheduleStatsByDate[date.key].emptyCount }}</b></span>
                   </div>
                 </th>
               </tr>
@@ -315,31 +324,42 @@
                     'is-picker-anchor': isPickerAnchor(row, date.key),
                   }"
                 >
-                  <button
+                  <el-tooltip
                     v-if="shiftOf(row, date.key) !== '休' || viewDensity === 'normal'"
-                    type="button"
-                    class="overview-shift-chip"
-                    :class="{
-                      'is-compact': viewDensity === 'compact',
-                      'is-regular': viewDensity === 'normal',
-                      'is-wide': viewDensity === 'compact' && compactPrefix(shiftOf(row, date.key)).length > 1,
-                    }"
-                    :style="chipStyle(shiftOf(row, date.key), isPickerAnchor(row, date.key))" :title="`${displayFullName(shiftOf(row, date.key))} ${displayTime(shiftOf(row, date.key))}`"
-                    @dblclick.stop.prevent="openBoardShiftPicker(row, date.key, $event)"
+                    :content="`${displayFullName(shiftOf(row, date.key))} ${displayTime(shiftOf(row, date.key))}`" :disabled="!legendChipNeedsTooltip(resolveZnShiftRecord(shiftOf(row, date.key)))"
+                    effect="dark"
+                    placement="top"
+                    popper-class="lui-pc-tooltip zn-shift-card-tooltip"
+                    :open-delay="150"
                   >
-                    <template v-if="viewDensity === 'compact'">
-                      <b>{{ compactPrefix(shiftOf(row, date.key)) }}</b>
-                      <small>{{ compactIndex(shiftOf(row, date.key)) }}</small>
-                    </template>
-                    <template v-else>
-                      <b>{{ displayFullName(shiftOf(row, date.key)) }}</b>
-                      <small>{{ displayTime(shiftOf(row, date.key)) }}</small>
-                    </template>
-                  </button>
+                    <button
+                      type="button"
+                      class="overview-shift-chip"
+                      :class="{
+                        'is-compact': viewDensity === 'compact',
+                        'is-regular': viewDensity === 'normal',
+                        'is-rest-shift': viewDensity === 'normal' && shiftOf(row, date.key) === '休',
+                        'is-wide': viewDensity === 'compact' && compactPrefix(shiftOf(row, date.key)).length > 1,
+                      }"
+                      :style="chipStyle(shiftOf(row, date.key), isPickerAnchor(row, date.key))"
+                      :title="legendChipNeedsTooltip(resolveZnShiftRecord(shiftOf(row, date.key))) ? null : `${displayFullName(shiftOf(row, date.key))} ${displayTime(shiftOf(row, date.key))}`"
+                      @dblclick.stop.prevent="openBoardShiftPicker(row, date.key, $event)"
+                    >
+                      <template v-if="viewDensity === 'compact'">
+                        <b>{{ compactPrefix(shiftOf(row, date.key)) }}</b>
+                        <small>{{ compactIndex(shiftOf(row, date.key)) }}</small>
+                      </template>
+                      <template v-else>
+                        <b>{{ displayFullName(shiftOf(row, date.key)) }}</b>
+                        <small>{{ displayTime(shiftOf(row, date.key)) }}</small>
+                      </template>
+                    </button>
+                  </el-tooltip>
                   <span
                     v-else
                     class="rest-cell"
                     :style="restCellStyle(isPickerAnchor(row, date.key))"
+                    title="休息 00:00-23:59"
                     @dblclick.stop.prevent="openBoardShiftPicker(row, date.key, $event)"
                   >休</span>
                 </td>
@@ -424,7 +444,9 @@
           effect="dark"
           placement="bottom"
           popper-class="lui-pc-tooltip"
-          content="系统根据历史排班记录生成一个月排班，可逐人修改循环周期、复制配置或双击班次调整。"
+          :content="configMode === 'newcomers'
+            ? '系统根据历史排班记录为新人生成一个月排班，可修改排期起始、循环周期或双击班次调整。'
+            : '系统根据历史排班记录生成一个月排班，可逐人修改循环周期、复制配置或双击班次调整。'"
         >
           <span class="zn-cycle-dialog__help-btn" tabindex="0" role="button" aria-label="帮助说明">
             <i class="el-icon-help zn-cycle-dialog__help-icon" aria-hidden="true"></i>
@@ -433,21 +455,6 @@
       </span>
 
       <div class="zn-cycle-dialog__head" :class="{ 'has-rule-toast': !!publishRuleToast }">
-        <div class="zn-cycle-dialog__head-row">
-          <div class="zn-cycle-dialog__head-left">
-            <span class="head-label">排班时间</span>
-            <el-date-picker
-              v-model="configStartDate"
-              type="date"
-              class="overseas-query-date zn-cycle-month-picker"
-              popper-class="overseas-date-popper"
-              placeholder="选择开始日期"
-              format="yyyy年MM月dd日"
-              value-format="yyyy-MM-dd"
-              @change="clearPublishViolations"
-            />
-          </div>
-        </div>
         <div class="zn-cycle-dialog__head-meta">
           <div class="zn-cycle-dialog__head-meta-left">
             <div class="zn-cycle-rule-toast-slot" :class="{ 'is-active': !!publishRuleToast }">
@@ -470,9 +477,10 @@
             <colgroup>
               <col class="zn-cycle-col-person" />
               <col class="zn-cycle-col-rest" />
+              <col class="zn-cycle-col-start" />
               <col class="zn-cycle-col-period" />
               <col v-for="day in cycleDayHeaders" :key="`col-${day.key}`" class="zn-cycle-col-day" />
-              <col class="zn-cycle-col-operation" />
+              <col v-if="configMode !== 'newcomers'" class="zn-cycle-col-operation" />
             </colgroup>
             <thead>
               <tr>
@@ -481,7 +489,8 @@
                     <span class="zn-cycle-matrix__person-label">人员</span>
                   </div>
                 </th>
-                <th class="overview-rest-col" aria-label="排休时间"><el-tooltip content="排休时间" placement="top" popper-class="lui-pc-tooltip"><i class="el-icon-time"></i></el-tooltip></th>
+                <th class="overview-rest-col" aria-label="排休">排休</th>
+                <th class="overview-start-col">排期起始</th>
                 <th class="overview-period-col">循环周期</th>
                 <th
                   v-for="day in cycleDayHeaders"
@@ -497,7 +506,7 @@
                     </span>
                   </div>
                 </th>
-                <th class="overview-operation-col">操作</th>
+                <th v-if="configMode !== 'newcomers'" class="overview-operation-col">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -516,6 +525,9 @@
                   </div>
                 </td>
                 <td class="overview-rest-cell">{{ configRestCount(item) }}</td>
+                <td class="overview-start-cell">
+                  <el-date-picker v-model="item.scheduleStartDate" type="date" class="zn-cycle-start-picker" popper-class="overseas-date-popper" format="MM月dd日" value-format="yyyy-MM-dd" placeholder="选择日期" :picker-options="cycleStartPickerOptions" @change="clearPublishViolations" />
+                </td>
                 <td class="overview-period-cell">
                   <div class="zn-cycle-period-inline" :class="{ 'is-error': !!validateCycleDays(item.cycleDays) }">
                     <el-input
@@ -545,7 +557,7 @@
                   @mouseenter="extendCycleRangeSelect(index, dayIdx)"
                 >
                   <button
-                    v-if="shift !== '休'"
+                    v-if="shift && shift !== '休'"
                     type="button"
                     class="overview-shift-chip is-compact"
                     :class="{ 'is-wide': compactPrefix(shift).length > 1 }"
@@ -556,13 +568,14 @@
                     <small>{{ compactIndex(shift) }}</small>
                   </button>
                   <span
-                    v-else
+                    v-else-if="shift"
                     class="rest-cell"
                     :style="restCellStyle(isCyclePickerAnchor(index, dayIdx))"
+                    title="休息 00:00-23:59"
                     @dblclick.stop.prevent="openCycleShiftPicker(index, dayIdx, $event)"
                   >休</span>
                 </td>
-                <td class="overview-operation-cell">
+                <td v-if="configMode !== 'newcomers'" class="overview-operation-cell">
                   <el-button type="text" class="zn-cycle-copy-link" @click="openCopySchedule(item)">复制</el-button>
                 </td>
               </tr>
@@ -668,14 +681,16 @@
               :value="selectedPickerShiftIds.includes(shift.id)"
               @change="togglePickerShift(shift.id, $event)"
             />
-            <span
-              class="shift-picker-chip"
-              :class="{ 'is-rest': shift.isRest, 'is-empty': shift.isEmpty }"
-              :style="pickerChipStyle(shift)" :title="`${shift.name} ${formatShiftRange(shift.time)}`"
-            >
-              <b>{{ shift.name }}</b>
-              <small>{{ formatShiftRange(shift.time) }}</small>
-            </span>
+            <el-tooltip :content="`${shift.name} ${formatShiftRange(shift.time)}`" :disabled="!legendChipNeedsTooltip(shift)" effect="dark" placement="top" popper-class="lui-pc-tooltip zn-shift-card-tooltip" :open-delay="150">
+              <span
+                class="shift-picker-chip"
+                :class="{ 'is-rest': shift.isRest, 'is-empty': shift.isEmpty }"
+                :style="pickerChipStyle(shift)"
+              >
+                <b>{{ shift.name }}</b>
+                <small>{{ formatShiftRange(shift.time) }}</small>
+              </span>
+            </el-tooltip>
           </label>
         </div>
         <div v-else-if="shiftPickerTab === 'cycle'" class="shift-picker-cycle">
@@ -683,7 +698,7 @@
           <span>从当前选中日期开始，应用到当前全部时间范围</span>
         </div>
         <temporary-shift-editor v-else v-model="temporaryShiftForm" :shift-name="temporaryShiftBase.name" :people="boardRows" :dates="dates"
-          :selected-person-id="shiftPickerTarget && shiftPickerTarget.row ? shiftPickerTarget.row.id : ''"
+          :selected-person-id="shiftPickerTarget && !shiftPickerTarget.fromToolbar && shiftPickerTarget.row ? shiftPickerTarget.row.id : ''"
           :show-person-filter="Boolean(shiftPickerTarget && shiftPickerTarget.fromToolbar)" @target-change="onTemporaryTargetChange" />
       </div>
       <span slot="footer" class="shift-picker-footer">
@@ -707,6 +722,7 @@ import TemporaryShiftEditor from '../components/TemporaryShiftEditor.vue'
 import PersonExceptionDialog from './PersonExceptionDialog.vue'
 import shiftLegendEditing from '../mixins/shiftLegendEditing'
 import shiftPickerRules from '../mixins/shiftPickerRules'
+import scheduleFilterEnhancements from '../mixins/scheduleFilterEnhancements'
 import {
   ZN_SHIFTS,
   ZN_STATISTICS_ROWS,
@@ -726,7 +742,7 @@ import {
   buildCalendarMonthDates,
 } from './mock'
 import { assetUrl } from '../utils/assetUrl'
-import { resolveShiftChipStyle, compactShiftParts, formatShiftTimeRange, sortShiftsByFamily, nextShiftLevel, validateShiftLevel, familyLabelOf, decorateShift } from '../utils/shiftPalette'
+import { resolveShiftChipStyle, resolveShiftSelectedBorder, compactShiftParts, formatShiftTimeRange, sortShiftsByFamily, nextShiftLevel, validateShiftLevel, familyLabelOf, decorateShift } from '../utils/shiftPalette'
 import { mergeScopedShifts } from '../utils/scopedShiftStore'
 function datesForScheduleMonth(monthStr) {
   return buildCalendarMonthDates(monthStr || '2026-09', PROTOTYPE_TODAY)
@@ -780,7 +796,7 @@ function normalizeCycleDayCount(value, fallback = 7) {
 export default {
   name: 'ZnShiftModule',
   components: { ShellIcon, ScheduleStatisticsPanel, OperationHelpDialog, AddShiftDrawer, AddRotationDrawer, AddEmployeeDrawer, TemporaryShiftEditor, PersonExceptionDialog },
-  mixins: [shiftLegendEditing, shiftPickerRules],
+  mixins: [shiftLegendEditing, shiftPickerRules, scheduleFilterEnhancements],
   props: {
     initialContext: { type: Object, default: () => ({}) },
   },
@@ -799,12 +815,14 @@ export default {
       filterPopoverVisible: false,
       filterDraft: {
         onlyUnscheduled: false,
+        showScheduleData: false,
         staffStatus: ['normal', 'changed'],
         empType: ['A', 'I'],
         position: ['sorter'],
       },
       filterApplied: {
         onlyUnscheduled: false,
+        showScheduleData: false,
         staffStatus: ['normal', 'changed'],
         empType: ['A', 'I'],
         position: ['sorter'],
@@ -931,6 +949,9 @@ export default {
     },
     temporaryShiftBase() {
       if (!this.shiftPickerTarget || this.shiftPickerTarget.type !== 'board') return { name: '--', time: '' }
+      if (Array.isArray(this.shiftPickerTarget.rows) && this.shiftPickerTarget.rows.length > 1) {
+        return { name: `批量修改（${this.shiftPickerTarget.rows.length}人）`, time: '' }
+      }
       const { row, dateKey } = this.shiftPickerTarget
       if (!row || !dateKey) return { name: '--', time: '' }
       const shiftId = row && row.shifts ? row.shifts[dateKey] : null
@@ -952,19 +973,20 @@ export default {
           && filters.staffStatus.includes(staffStatus) && filters.empType.includes(empType) && filters.position.includes(position)
       })
     },
-    hasActiveScheduleFilter() {
-      return this.onlyUnscheduled
-        || this.filterApplied.staffStatus.length < 2
-        || this.filterApplied.empType.length < 2
-        || this.filterApplied.position.length < 1
-    },
     cycleDayHeaders() {
       return buildScheduleRangeDates(this.configStartDate || '2026-09-21', PROTOTYPE_TODAY)
+    },
+    cycleStartPickerOptions() {
+      const [year, month, day] = startDateForScheduleMonth(this.scheduleMonth).split('-').map(Number)
+      const minimumStartTime = new Date(year, month - 1, day).getTime()
+      return { disabledDate: (date) => date.getTime() < minimumStartTime }
     },
     cycleMatrixStyle() {
       const days = Math.max(1, this.cycleDayHeaders.length)
       const dayCol = 64
-      const fixedWidth = 332 // 人员 108 + 排休 48 + 周期 104 + 操作 72
+      const fixedWidth = this.configMode === 'newcomers'
+        ? 380 // 人员 108 + 排休 48 + 排期起始 120 + 周期 104
+        : 452 // 上述 380 + 操作 72
       return {
         '--cycle-days': days,
         '--cycle-day-col-width': `${dayCol}px`,
@@ -994,12 +1016,10 @@ export default {
       if (!row) return ''
       return `将「${row.name}」的班次和循环周期复制给另一位人员，目标人员原配置将被覆盖。`
     },
-    /** 整月日期列：一屏最多 31 天均分宽度 */
+    /** 精简态每个日期列固定 40px，内部豆腐块固定 36px。 */
     scheduleMatrixStyle() {
       const days = Math.max(1, (this.dates && this.dates.length) || 31)
-      return {
-        '--schedule-day-count': days,
-      }
+      return { '--schedule-day-count': days, '--schedule-compact-table-width': `${200 + (days * 40)}px` }
     },
     statisticsDates() {
       return this.dates
@@ -1058,37 +1078,6 @@ export default {
     openShiftEditor() {
       this.editingShiftId = null
       this.shiftEditorVisible = true
-    },
-    createDefaultFilterState() {
-      return {
-        onlyUnscheduled: false,
-        staffStatus: ['normal', 'changed'],
-        empType: ['A', 'I'],
-        position: ['sorter'],
-      }
-    },
-    cloneFilterState(source) {
-      return {
-        onlyUnscheduled: Boolean(source.onlyUnscheduled),
-        staffStatus: [...(source.staffStatus || [])],
-        empType: [...(source.empType || [])],
-        position: [...(source.position || [])],
-      }
-    },
-    onFilterPopoverShow() {
-      this.filterDraft = this.cloneFilterState({
-        ...this.filterApplied,
-        onlyUnscheduled: this.onlyUnscheduled,
-      })
-    },
-    cancelFilterDraft() {
-      this.filterPopoverVisible = false
-    },
-    applyFilterDraft() {
-      this.filterApplied = this.cloneFilterState(this.filterDraft)
-      this.onlyUnscheduled = Boolean(this.filterDraft.onlyUnscheduled)
-      this.filterPopoverVisible = false
-      this.notify(this.onlyUnscheduled ? '已筛选仅看未排班人员' : '筛选条件已应用')
     },
     openRotationEditor() {
       this.editingRotationId = null
@@ -1329,6 +1318,9 @@ export default {
     legendChipStyle(shift) {
       return resolveShiftChipStyle(shift)
     },
+    legendChipNeedsTooltip(shift) {
+      return (shift && shift.shiftType === 'jump') || String((shift && shift.name) || '').includes('(跳)') || this.formatShiftRange(shift && shift.time).includes('/')
+    },
     shiftOf(row, dateKey) {
       const v = row.shifts && row.shifts[dateKey]
       return v == null ? '休' : v
@@ -1367,10 +1359,11 @@ export default {
     chipStyle(shiftId, selected = false) {
       if (shiftId === 'EMPTY') {
         return {
-          background: '#868d9f',
-          color: '#ffffff',
-          borderColor: '#868d9f',
-          boxShadow: selected ? 'inset 0 0 0 2px #3c6ef0' : 'none',
+          background: 'transparent',
+          color: '#868D9F',
+          borderColor: 'transparent',
+          '--shift-selected-border': 'transparent',
+          boxShadow: 'none',
         }
       }
       const s = this.resolveZnShiftRecord(shiftId)
@@ -1378,19 +1371,8 @@ export default {
       return resolveShiftChipStyle(s || { isRest: true, name: '休息', time: '00:00-23:59' }, selected)
     },
     restCellStyle(selected = false) {
-      // 精简态「休」字块：未选中也套休息底色
-      const base = resolveShiftChipStyle({ isRest: true })
-      if (!selected) return {
-        background: base.background,
-        color: base.color,
-        borderColor: base.borderColor,
-      }
-      return {
-        background: base.background,
-        color: base.color,
-        borderColor: base.borderColor,
-        boxShadow: `inset 0 0 0 2px ${base.color}`,
-      }
+      // 精简态「休」字块：未选中也套休息底色，选中统一使用休息描边色
+      return resolveShiftChipStyle({ isRest: true }, selected)
     },
     onSmartScheduleClick() {
       if (!this.department) return this.$message.warning('请选择部门')
@@ -1422,11 +1404,11 @@ export default {
         return
       }
       this.configStartDate = startDateForScheduleMonth(this.scheduleMonth)
-      this.editingConfigs = cloneCycleConfigs(
+      this.editingConfigs = this.prepareCycleConfigs(
         this.cycleConfigs.filter((c) => !c.isNew || c.confirmed),
-      ).map((c) => syncPatternLength(c))
+      )
       if (!this.editingConfigs.length) {
-        this.editingConfigs = cloneCycleConfigs(this.cycleConfigs).map((c) => syncPatternLength(c))
+        this.editingConfigs = this.prepareCycleConfigs(this.cycleConfigs)
       }
       this.configDialogVisible = true
     },
@@ -1439,9 +1421,10 @@ export default {
         return
       }
       this.configStartDate = startDateForScheduleMonth(this.scheduleMonth)
-      this.editingConfigs = cloneCycleConfigs(this.pendingNewcomers).map((c) => syncPatternLength(c))
+      this.editingConfigs = this.prepareCycleConfigs(this.pendingNewcomers)
       this.configDialogVisible = true
     },
+    prepareCycleConfigs(list) { return cloneCycleConfigs(list).map((c) => syncPatternLength({ ...c, scheduleStartDate: c.scheduleStartDate || this.configStartDate })) },
     validateCycleDays(value) {
       const n = Number(value)
       if (!Number.isFinite(n) || n < this.CYCLE_DAYS_MIN) {
@@ -1463,10 +1446,10 @@ export default {
       return resizeCyclePatternWithRest(item.pattern || [], n)
     },
     visibleSchedulePattern(item) {
-      if (normalizeCycleDayCount(item.cycleDays) === 0) {
-        return Array.from({ length: this.cycleDayHeaders.length }, () => 'EMPTY')
-      }
-      return resizePatternLoop(this.cyclePattern(item), this.cycleDayHeaders.length)
+      const startIndex = this.cycleDayHeaders.findIndex((day) => day.fullKey >= (item.scheduleStartDate || this.configStartDate))
+      const emptyDays = startIndex < 0 ? this.cycleDayHeaders.length : startIndex
+      if (normalizeCycleDayCount(item.cycleDays) === 0) return [...Array(emptyDays).fill(''), ...Array(this.cycleDayHeaders.length - emptyDays).fill('EMPTY')]
+      return [...Array(emptyDays).fill(''), ...resizePatternLoop(this.cyclePattern(item), this.cycleDayHeaders.length - emptyDays)]
     },
     configRestCount(item) {
       return this.visibleSchedulePattern(item).filter((p) => p === '休' || p === 'REST').length
@@ -1631,12 +1614,12 @@ export default {
       const draft = this.cycleDraft
       if (!draft || draft.mode !== 'newcomers') return false
 
-      const draftNewcomers = cloneCycleConfigs(draft.editingConfigs)
-        .map((c) => ({ ...syncPatternLength(c), isDraft: true }))
+      const draftNewcomers = this.prepareCycleConfigs(draft.editingConfigs)
+        .map((c) => ({ ...c, isDraft: true }))
       const draftIds = new Set(draftNewcomers.map((c) => c.id))
-      const publishedConfigs = cloneCycleConfigs(
+      const publishedConfigs = this.prepareCycleConfigs(
         this.cycleConfigs.filter((c) => (!c.isNew || c.confirmed) && !draftIds.has(c.id)),
-      ).map((c) => syncPatternLength(c))
+      )
 
       this.configMode = 'all'
       this.configStartDate = draft.configStartDate || startDateForScheduleMonth(draft.configMonth || this.scheduleMonth)
@@ -1649,7 +1632,7 @@ export default {
       if (!draft || draft.mode !== mode) return false
       this.configMode = draft.mode
       this.configStartDate = draft.configStartDate || startDateForScheduleMonth(draft.configMonth || this.scheduleMonth)
-      this.editingConfigs = cloneCycleConfigs(draft.editingConfigs).map((c) => syncPatternLength(c))
+      this.editingConfigs = this.prepareCycleConfigs(draft.editingConfigs)
       this.clearPublishViolations()
       return true
     },
@@ -1691,11 +1674,17 @@ export default {
       this.shiftPickerTab = 'temporary'
       this.temporaryShiftForm = { date: '', segments: [] }
     },
-    onTemporaryTargetChange({ personId, date }) {
-      const row = this.boardRows.find((item) => String(item.id) === String(personId))
-      if (!row || !date) return
-      this.shiftPickerTarget = { type: 'board', row, dateKey: date.slice(5), fullDate: date, fromToolbar: true }
-      this.initializeTemporaryShiftForm(row.shifts[date.slice(5)], date)
+    onTemporaryTargetChange({ personIds = [], date }) {
+      const selectedIds = new Set(personIds.map((id) => String(id)))
+      const rows = this.boardRows.filter((item) => selectedIds.has(String(item.id)))
+      if (!rows.length || !date) {
+        this.shiftPickerTarget = { type: 'board', row: null, rows: [], dateKey: date ? date.slice(5) : '', fullDate: date || '', fromToolbar: true }
+        this.temporaryShiftForm = { date: date || '', segments: [] }
+        return
+      }
+      const dateKey = date.slice(5)
+      this.shiftPickerTarget = { type: 'board', row: rows[0], rows, dateKey, fullDate: date, fromToolbar: true }
+      this.initializeTemporaryShiftForm(rows[0].shifts[dateKey], date)
     },
     openCycleShiftPicker(empIndex, dayIdx, event) {
       const item = this.editingConfigs[empIndex]
@@ -1840,33 +1829,40 @@ export default {
     },
     saveTemporaryShift() {
       if (!this.shiftPickerTarget || this.shiftPickerTarget.type !== 'board' || !this.shiftPickerTarget.row) return false
-      const { row, dateKey: sourceDateKey } = this.shiftPickerTarget
+      const { row, rows: selectedRows, dateKey: sourceDateKey } = this.shiftPickerTarget
+      const targetRows = Array.isArray(selectedRows) && selectedRows.length ? selectedRows : [row]
       const { date } = this.temporaryShiftForm
       const segments = Array.isArray(this.temporaryShiftForm.segments) && this.temporaryShiftForm.segments.length ? this.temporaryShiftForm.segments : [this.temporaryShiftForm]
       if (!date || segments.some((segment) => !segment.startTime || !segment.endTime)) {
         this.showShiftPickerMessage('warning', '请完整填写班次日期和上下班时间')
         return false
       }
-      const sourceShiftId = row.shifts[sourceDateKey]
-      const base = sourceShiftId === 'EMPTY'
-        ? EMPTY_SHIFT_OPTION
-        : this.resolveZnShiftRecord(sourceShiftId)
       const targetDateKey = date.slice(5)
-      const id = `TEMP-${row.id}-${date.replace(/-/g, '')}-${Date.now()}`
-      const temporaryShift = decorateShift({
-        ...base,
-        id,
-        name: base.isRest || base.isEmpty ? '临时班次' : base.name,
-        time: segments.map((segment) => `${segment.startTime}-${segment.endTime}`).join(' / '),
-        isRest: false,
-        isEmpty: false,
-        temporary: true,
+      const time = segments.map((segment) => `${segment.startTime}-${segment.endTime}`).join(' / ')
+      const addedShifts = targetRows.map((targetRow, index) => {
+        const sourceShiftId = targetRow.shifts[sourceDateKey]
+        const base = sourceShiftId === 'EMPTY'
+          ? EMPTY_SHIFT_OPTION
+          : this.resolveZnShiftRecord(sourceShiftId)
+        const id = `TEMP-${targetRow.id}-${date.replace(/-/g, '')}-${Date.now()}-${index}`
+        const temporaryShift = decorateShift({
+          ...base,
+          id,
+          name: base.isRest || base.isEmpty ? '临时班次' : base.name,
+          time,
+          isRest: false,
+          isEmpty: false,
+          temporary: true,
+        })
+        this.$set(targetRow.shifts, targetDateKey, id)
+        return temporaryShift
       })
-      this.shifts = this.shifts.concat([temporaryShift])
-      this.$set(row.shifts, targetDateKey, id)
+      this.shifts = this.shifts.concat(addedShifts)
       this.markBoardDirty()
       this.shiftPickerVisible = false
-      this.showShiftPickerMessage('success', `已临时修改 ${row.name} ${date} 的上下班时间`)
+      this.showShiftPickerMessage('success', targetRows.length > 1
+        ? `已临时修改 ${targetRows.length} 人 ${date} 的上下班时间`
+        : `已临时修改 ${row.name} ${date} 的上下班时间`)
       return true
     },
     resetShiftPicker() {
@@ -2035,10 +2031,10 @@ export default {
     },
     pickerChipStyle(shift) {
       if (shift && shift.isEmpty) {
-        return { background: '#868d9f', color: '#ffffff', borderColor: '#868d9f' }
+        return { background: 'transparent', color: '#868D9F', borderColor: 'transparent', '--shift-selected-border': 'transparent' }
       }
       const style = resolveShiftChipStyle(shift)
-      return { ...style, '--shift-selected-border': style.color === '#FFFFFF' ? style.background : style.color }
+      return { ...style, '--shift-selected-border': resolveShiftSelectedBorder(shift) }
     },
     darkenHex(hex, amount = 0.08) {
       if (!hex || typeof hex !== 'string') return '#525765'
@@ -2152,7 +2148,7 @@ export default {
 
 <style lang="scss" scoped>
 .zn-query-grid.is-single-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-@media (min-width: 1200px) and (max-width: 1920px) { .zn-query-grid.is-single-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } .zn-query-grid.is-single-row .overview-query-actions { grid-column: 3; grid-row: 2; } }
+@media (min-width: 1200px) and (max-width: 1920px) { .zn-query-grid.is-single-row { grid-template-columns: repeat(4, minmax(0, 1fr)); } .zn-query-grid.is-single-row .overview-query-actions { grid-column: 4; grid-row: 1; } }
 @media (min-width: 720px) and (max-width: 1199px) { .zn-query-grid.is-single-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .zn-query-grid.is-single-row .overview-query-actions { grid-column: 2; grid-row: 2; } }
 @media (max-width: 719px) { .zn-query-grid.is-single-row { grid-template-columns: minmax(0, 1fr); } .zn-query-grid.is-single-row .overview-query-actions { grid-column: 1; grid-row: auto; } }
 
@@ -2339,6 +2335,7 @@ export default {
   line-height: 16px;
 }
 
+
 .zn-shift-module .overview-matrix .overview-date-col.is-past {
   color: #a0a6b3;
   background: #f7f8fa;
@@ -2501,7 +2498,9 @@ export default {
 
 .zn-shift-module .overview-shift-cell.is-picker-anchor .overview-shift-chip,
 .zn-shift-module .overview-shift-cell.is-picker-anchor .rest-cell {
-  box-shadow: inset 0 0 0 2px #3c6ef0;
+  border: 1px solid var(--shift-selected-border, #3c6ef0);
+  box-shadow: none;
+  outline: none;
 }
 </style>
 
@@ -2526,6 +2525,7 @@ export default {
   flex-direction: column;
   gap: 12px;
 }
+
 
 .zn-schedule-filter__title {
   color: #23252b;
@@ -2899,7 +2899,9 @@ export default {
 
 .zn-cycle-matrix.overview-matrix .overview-shift-cell.is-range-selected .overview-shift-chip,
 .zn-cycle-matrix.overview-matrix .overview-shift-cell.is-range-selected .rest-cell {
-  box-shadow: inset 0 0 0 2px #3c6ef0 !important;
+  border: 1px solid var(--shift-selected-border, #3c6ef0) !important;
+  box-shadow: none !important;
+  outline: none;
 }
 
 .zn-cycle-matrix.overview-matrix .zn-cycle-col-person {
@@ -3334,7 +3336,9 @@ export default {
 
 .zn-cycle-matrix .overview-shift-cell.is-picker-anchor .overview-shift-chip,
 .zn-cycle-matrix .overview-shift-cell.is-picker-anchor .rest-cell {
-  box-shadow: inset 0 0 0 2px #3c6ef0;
+  border: 1px solid var(--shift-selected-border, #3c6ef0);
+  box-shadow: none;
+  outline: none;
 }
 
 .zn-newcomer-tip-dialog {

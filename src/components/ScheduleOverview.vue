@@ -305,9 +305,7 @@
                   />
                 </div>
               </th>
-              <th class="overview-rest-col" aria-label="排休时间">
-                <el-tooltip content="排休时间" placement="top" popper-class="lui-pc-tooltip"><i class="el-icon-time"></i></el-tooltip>
-              </th>
+              <th class="overview-rest-col" aria-label="排休">排休</th>
               <th
                 v-for="date in overviewDates"
                 :key="date.key"
@@ -379,6 +377,7 @@
                     'is-regular': viewDensity === 'normal',
                   }"
                   :style="restCellStyle(isPickerAnchor(row, date.key))"
+                  title="休息 00:00-23:59"
                   @dblclick.stop.prevent="openReplace(row, date, $event)"
                 >{{ viewDensity === 'compact' ? '休' : '休息' }}</span>
               </td>
@@ -702,8 +701,7 @@ export default {
     },
     restCellStyle(selected = false) {
       if (!selected) return {}
-      const stroke = this.darkenHex('#A8AEB8', 0.08)
-      return { borderColor: stroke, boxShadow: `inset 0 0 0 1px ${stroke}` }
+      return resolveShiftChipStyle({ isRest: true }, true)
     },
     darkenHex(hex, amount = 0.08) {
       if (!hex || typeof hex !== 'string') return '#525765'

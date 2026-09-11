@@ -240,7 +240,7 @@ button, input { font-family: inherit; }
 .hours-cell strong { font-size: 14px; }
 .hours-cell small { margin-top: 2px; color: #8f96a0; font-size: 12px; }
 .shift-cell { height: auto; padding: 4px; text-align: center; background: #fbfbfc; }
-.shift-chip { width: 100%; height: 40px; min-height: 40px; padding: 2px 4px; border: 1px solid; border-radius: 4px; box-sizing: border-box; cursor: pointer; }
+.shift-chip { width: 100%; height: 40px; min-height: 40px; padding: 2px 4px; border: 1px solid; border-radius: 8px; box-sizing: border-box; cursor: pointer; }
 .shift-chip b, .shift-chip small { display: block; }
 .shift-chip b { font-size: 12px; }
 .shift-chip small { margin-top: 3px; opacity: 1; font-size: 12px; }
@@ -1048,10 +1048,10 @@ body.is-page-fullscreen { overflow: hidden; }
   box-sizing: border-box;
   width: auto;
   height: auto;
-  min-height: 38px;
+  min-height: 40px;
   padding: 6px 12px;
   border: 0;
-  border-radius: 4px;
+  border-radius: 8px;
   appearance: none;
   font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 12px;
@@ -1065,8 +1065,8 @@ body.is-page-fullscreen { overflow: hidden; }
 .overview-shift-chip small {
   display: block;
   max-width: 100%;
-  overflow: visible;
-  text-overflow: clip;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
   color: inherit;
   font-family: inherit;
@@ -1091,8 +1091,8 @@ body.is-page-fullscreen { overflow: hidden; }
   width: 36px;
   min-width: 36px;
   max-width: 36px;
-  height: 38px;
-  min-height: 38px;
+  height: 40px;
+  min-height: 40px;
   margin: 0 auto;
   padding: 6px 2px;
   overflow: hidden;
@@ -1151,11 +1151,11 @@ body.is-page-fullscreen { overflow: hidden; }
   justify-content: center;
   box-sizing: border-box;
   width: auto;
-  height: 36px;
-  min-height: 36px;
+  height: 40px;
+  min-height: 40px;
   margin: 0 auto;
   padding: 0 4px;
-  border-radius: 4px;
+  border-radius: 8px;
   color: #a0a6af;
   font-size: 12px;
   line-height: 12px;
@@ -1167,7 +1167,7 @@ body.is-page-fullscreen { overflow: hidden; }
   width: 36px;
   min-width: 36px;
   max-width: 36px;
-  height: 38px;
+  height: 40px;
   padding: 6px 2px;
   font-size: 12px;
   line-height: 12px;
@@ -1566,7 +1566,7 @@ body,
 .shift-cell,
 .overview-shift-cell { border-color: #f1f2f4; background: #fff; }
 .shift-chip,
-.overview-shift-chip { border-radius: 4px; }
+.overview-shift-chip { border-radius: 8px; }
 .daily-compare { color: #525765; font-size: 14px; line-height: 20px; }
 .schedule-tip { color: #868d9f; font-size: 12px; line-height: 18px; }
 
@@ -4090,18 +4090,18 @@ body.shift-picker-scroll-lock {
 .overseas-schedule-app .topbar .brand-logo-group {
   display: inline-flex;
   align-items: center;
-  width: 120px;
-  height: 20px;
-  flex: 0 0 120px;
+  width: 35.1351px;
+  height: 26px;
+  flex: 0 0 35.1351px;
 }
 
 .overseas-schedule-app .topbar .brand-logo-combined {
   display: block;
-  width: 120px !important;
-  height: 20px !important;
+  width: 35.1351px !important;
+  height: 26px !important;
   object-fit: contain;
   flex-shrink: 0;
-  transform: translateY(-2px);
+  transform: none;
 }
 
 .overseas-schedule-app .topbar .brand-title {

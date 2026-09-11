@@ -17,12 +17,6 @@
         @submit.native.prevent
       >
         <div class="zn-form-drawer__grid zn-form-drawer__grid--3">
-          <el-form-item label="部门" required>
-            <el-input :value="departmentLabel" disabled />
-          </el-form-item>
-          <el-form-item label="考勤组">
-            <el-input :value="attendanceGroupLabel" disabled />
-          </el-form-item>
           <el-form-item label="班次名称" required>
             <div class="zn-shift-name-field">
               <el-select v-model="form.family" class="zn-shift-name-field__family" placeholder="请选择" popper-class="overseas-select-popper">
@@ -121,7 +115,7 @@
               </button>
             </span>
           </el-alert>
-          <div class="zn-form-drawer__grid zn-add-shift-summary-grid">
+          <div class="zn-form-drawer__grid zn-form-drawer__grid--3 zn-add-shift-summary-grid">
             <el-form-item label="班次总时长">
               <el-input :value="String(totalHours)" disabled />
             </el-form-item>

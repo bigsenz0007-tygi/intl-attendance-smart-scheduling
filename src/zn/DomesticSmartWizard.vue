@@ -365,7 +365,7 @@
                           />
                         </div>
                       </th>
-                      <th class="overview-rest-col" aria-label="排休时间"><el-tooltip content="排休时间" placement="top" popper-class="lui-pc-tooltip"><i class="el-icon-time"></i></el-tooltip></th>
+                      <th class="overview-rest-col" aria-label="排休">排休</th>
                       <th
                         v-for="date in dates"
                         :key="date.key"
@@ -399,19 +399,40 @@
                         v-for="date in dates"
                         :key="date.key"
                         class="overview-shift-cell"
-                        :class="{ 'is-past': date.isPast, 'is-weekend': date.isWeekend }"
+                        :class="{
+                          'is-past': date.isPast,
+                          'is-weekend': date.isWeekend,
+                          'is-picker-anchor': isPickerAnchor(row, date.key),
+                        }"
                       >
-                        <button
+                        <el-tooltip
                           v-if="shiftOf(row, date.key) !== '休'"
-                          type="button"
-                          class="overview-shift-chip is-compact"
-                          :class="{ 'is-wide': compactPrefix(shiftOf(row, date.key)).length > 1 }"
-                          :style="chipStyle(shiftOf(row, date.key))" :title="`${findShift(shiftOf(row, date.key)).name} ${formatShiftRange(findShift(shiftOf(row, date.key)).time)}`"
+                          :content="`${findShift(shiftOf(row, date.key)).name} ${formatShiftRange(findShift(shiftOf(row, date.key)).time)}`"
+                          :disabled="!legendChipNeedsTooltip(findShift(shiftOf(row, date.key)))"
+                          effect="dark"
+                          placement="top"
+                          popper-class="lui-pc-tooltip zn-shift-card-tooltip"
+                          :open-delay="150"
                         >
-                          <b>{{ compactPrefix(shiftOf(row, date.key)) }}</b>
-                          <small>{{ compactIndex(shiftOf(row, date.key)) }}</small>
-                        </button>
-                        <span v-else class="rest-cell">休</span>
+                          <button
+                            type="button"
+                            class="overview-shift-chip is-compact"
+                            :class="{ 'is-wide': compactPrefix(shiftOf(row, date.key)).length > 1 }"
+                            :style="chipStyle(shiftOf(row, date.key), isPickerAnchor(row, date.key))"
+                            :title="legendChipNeedsTooltip(findShift(shiftOf(row, date.key))) ? null : `${findShift(shiftOf(row, date.key)).name} ${formatShiftRange(findShift(shiftOf(row, date.key)).time)}`"
+                            @dblclick.stop.prevent="openBoardShiftPicker(row, date.key, $event)"
+                          >
+                            <b>{{ compactPrefix(shiftOf(row, date.key)) }}</b>
+                            <small>{{ compactIndex(shiftOf(row, date.key)) }}</small>
+                          </button>
+                        </el-tooltip>
+                        <span
+                          v-else
+                          class="rest-cell"
+                          :style="restCellStyle(isPickerAnchor(row, date.key))"
+                          title="休息 00:00-23:59"
+                          @dblclick.stop.prevent="openBoardShiftPicker(row, date.key, $event)"
+                        >休</span>
                       </td>
                     </tr>
                   </tbody>
@@ -445,6 +466,65 @@
       :disabled-keys="existingPersonKeys"
       @confirm="onAddPerson"
     />
+    <el-dialog
+      :custom-class="shiftPickerDialogClass"
+      :visible.sync="shiftPickerVisible"
+      :modal="false"
+      :close-on-click-modal="false"
+      :destroy-on-close="false"
+      append-to-body
+      width="500px"
+      top="0"
+      @opened="onShiftPickerOpened"
+      @closed="resetShiftPicker"
+    >
+      <div slot="title" class="shift-picker-tabs" role="tablist">
+        <button type="button" role="tab" class="shift-picker-tab is-active">按班次排</button>
+      </div>
+      <div class="shift-picker-body">
+        <el-input
+          v-model="shiftPickerKeyword"
+          clearable
+          prefix-icon="el-icon-search"
+          placeholder="模糊搜索班次"
+        />
+        <div class="shift-picker-grid">
+          <label
+            v-for="shift in filteredPickerShifts"
+            :key="shift.id"
+            class="shift-picker-option"
+            :class="{ 'is-selected': selectedPickerShiftIds.includes(shift.id) }"
+          >
+            <el-checkbox
+              :value="selectedPickerShiftIds.includes(shift.id)"
+              @change="togglePickerShift(shift.id, $event)"
+            />
+            <el-tooltip
+              :content="`${shift.name} ${formatShiftRange(shift.time)}`"
+              :disabled="!legendChipNeedsTooltip(shift)"
+              effect="dark"
+              placement="top"
+              popper-class="lui-pc-tooltip zn-shift-card-tooltip"
+              :open-delay="150"
+            >
+              <span
+                class="shift-picker-chip"
+                :class="{ 'is-rest': shift.isRest, 'is-empty': shift.isEmpty }"
+                :style="pickerChipStyle(shift)"
+              >
+                <b>{{ shift.name }}</b>
+                <small>{{ formatShiftRange(shift.time) }}</small>
+              </span>
+            </el-tooltip>
+          </label>
+        </div>
+      </div>
+      <span slot="footer" class="shift-picker-footer">
+        <el-button @click="shiftPickerVisible = false">取消</el-button>
+        <el-button @click="clearPickerShifts">清空</el-button>
+        <el-button type="primary" @click="saveShiftPicker">保存</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -453,6 +533,7 @@ import { assetUrl } from '../utils/assetUrl'
 import {
   decorateShift,
   resolveShiftChipStyle,
+  resolveShiftSelectedBorder,
   compactShiftParts,
   sortShiftsByFamily,
 } from '../utils/shiftPalette'
@@ -461,6 +542,7 @@ import ShellIcon from '../components/shell/ShellIcon.vue'
 import ConfirmShiftDialog from './ConfirmShiftDialog.vue'
 import MetricMonitorDialog from './MetricMonitorDialog.vue'
 import AddPersonDialog from './AddPersonDialog.vue'
+import shiftPickerRules from '../mixins/shiftPickerRules'
 import {
   ZN_SHIFTS,
   buildMonthDates,
@@ -499,6 +581,7 @@ export default {
     MetricMonitorDialog,
     AddPersonDialog,
   },
+  mixins: [shiftPickerRules],
   props: {
     initialContext: { type: Object, default: () => ({}) },
   },
@@ -562,6 +645,14 @@ export default {
         { label: 'Q-日结临时工', color: '#FC3737', background: '#FFF0F0', border: '#FFC4C4' },
       ],
       empVisibleLimit: 1,
+      shiftPickerVisible: false,
+      shiftPickerKeyword: '',
+      selectedPickerShiftIds: [],
+      shiftPickerTarget: null,
+      shiftPickerAnchorEl: null,
+      shiftPickerReady: false,
+      shiftPickerScrollLockY: 0,
+      scrollLockDepth: 0,
     }
   },
   computed: {
@@ -674,6 +765,24 @@ export default {
       const keyword = this.keyword.trim().toLowerCase()
       return this.boardRows.filter((row) => !keyword || `${row.name} ${row.code}`.toLowerCase().includes(keyword))
     },
+    filteredPickerShifts() {
+      const keyword = this.shiftPickerKeyword.trim().toLowerCase()
+      return sortShiftsByFamily(this.shifts.filter((shift) => (
+        !keyword || `${shift.name} ${shift.time}`.toLowerCase().includes(keyword)
+      )))
+    },
+    shiftPickerDialogClass() {
+      return [
+        'shift-picker-dialog',
+        'zn-shift-picker-dialog',
+        'is-day',
+        this.shiftPickerReady ? 'is-ready' : '',
+      ].filter(Boolean).join(' ')
+    },
+  },
+  beforeDestroy() {
+    document.removeEventListener('mousedown', this.onShiftPickerOutside, true)
+    while (this.scrollLockDepth > 0) this.unlockBackgroundScroll()
   },
   methods: {
     assetUrl,
@@ -1103,10 +1212,209 @@ export default {
     compactIndex(shiftId) {
       return compactShiftParts(this.findShift(shiftId)).index
     },
-    chipStyle(shiftId) {
+    chipStyle(shiftId, selected = false) {
       const shift = this.findShift(shiftId)
-      if (!shift || shift.isRest) return resolveShiftChipStyle({ isRest: true })
-      return resolveShiftChipStyle(shift)
+      if (!shift || shift.isRest) return resolveShiftChipStyle({ isRest: true }, selected)
+      return resolveShiftChipStyle(shift, selected)
+    },
+    restCellStyle(selected = false) {
+      return resolveShiftChipStyle({ isRest: true }, selected)
+    },
+    legendChipNeedsTooltip(shift) {
+      return Boolean(
+        (shift && shift.shiftType === 'jump')
+        || String((shift && shift.name) || '').includes('(跳)')
+        || formatShiftRange(shift && shift.time).includes('/'),
+      )
+    },
+    resolveZnShiftRecord(shiftId) {
+      return this.findShift(shiftId)
+    },
+    pickerChipStyle(shift) {
+      if (shift && shift.isEmpty) {
+        return {
+          background: 'transparent',
+          color: '#868D9F',
+          borderColor: 'transparent',
+          '--shift-selected-border': 'transparent',
+        }
+      }
+      const style = resolveShiftChipStyle(shift)
+      return { ...style, '--shift-selected-border': resolveShiftSelectedBorder(shift) }
+    },
+    openBoardShiftPicker(row, dateKey, event) {
+      const current = this.shiftOf(row, dateKey)
+      const mapped = current === '休' ? 'REST' : current
+      const currentShift = this.resolveZnShiftRecord(mapped)
+      const anchor = event && event.currentTarget ? event.currentTarget : null
+      const date = this.dates.find((item) => item.key === dateKey)
+      this.shiftPickerReady = false
+      this.shiftPickerTarget = {
+        row,
+        dateKey,
+        fullDate: (date && date.fullKey) || `${this.scheduleMonth}-${dateKey.slice(3)}`,
+      }
+      this.shiftPickerAnchorEl = anchor
+      this.shiftPickerKeyword = ''
+      this.selectedPickerShiftIds = currentShift && Array.isArray(currentShift.constituentIds)
+        ? [...currentShift.constituentIds]
+        : (mapped ? [mapped] : [])
+      this.applyShiftPickerCoords(anchor)
+      this.lockBackgroundScroll()
+      this.shiftPickerVisible = true
+      document.addEventListener('mousedown', this.onShiftPickerOutside, true)
+      this.$nextTick(() => {
+        this.applyShiftPickerCoords(this.shiftPickerAnchorEl)
+        requestAnimationFrame(() => {
+          this.applyShiftPickerCoords(this.shiftPickerAnchorEl)
+          this.shiftPickerReady = true
+        })
+      })
+    },
+    isPickerAnchor(row, dateKey) {
+      return Boolean(
+        this.shiftPickerVisible
+        && this.shiftPickerTarget
+        && this.shiftPickerTarget.row
+        && this.shiftPickerTarget.row.id === row.id
+        && this.shiftPickerTarget.dateKey === dateKey,
+      )
+    },
+    calcShiftPickerCoords(anchorEl, dialogWidth = 500, dialogHeight = 520) {
+      const viewportPadding = 16
+      const anchorGap = 12
+      const maxLeft = Math.max(viewportPadding, window.innerWidth - dialogWidth - viewportPadding)
+      const maxTop = Math.max(viewportPadding, window.innerHeight - dialogHeight - viewportPadding)
+      if (!anchorEl || typeof anchorEl.getBoundingClientRect !== 'function') {
+        return {
+          left: Math.round(Math.min(maxLeft, Math.max(viewportPadding, (window.innerWidth - dialogWidth) / 2))),
+          top: Math.round(Math.min(maxTop, Math.max(viewportPadding, 120))),
+        }
+      }
+      const rect = anchorEl.getBoundingClientRect()
+      let left
+      if (rect.right + anchorGap + dialogWidth <= window.innerWidth - viewportPadding) left = rect.right + anchorGap
+      else if (rect.left - anchorGap - dialogWidth >= viewportPadding) left = rect.left - anchorGap - dialogWidth
+      else left = rect.left + ((rect.width - dialogWidth) / 2)
+      return {
+        left: Math.round(Math.min(maxLeft, Math.max(viewportPadding, left))),
+        top: Math.round(Math.min(maxTop, Math.max(viewportPadding, rect.top))),
+      }
+    },
+    applyShiftPickerCoords(anchorEl, measuredDialog) {
+      const dialog = measuredDialog || document.querySelector('.zn-shift-picker-dialog')
+      const dialogWidth = (dialog && dialog.offsetWidth) || Math.min(500, window.innerWidth - 32)
+      const dialogHeight = (dialog && dialog.offsetHeight) || 520
+      const coords = this.calcShiftPickerCoords(anchorEl, dialogWidth, dialogHeight)
+      document.documentElement.style.setProperty('--shift-picker-left', `${coords.left}px`)
+      document.documentElement.style.setProperty('--shift-picker-top', `${coords.top}px`)
+      if (dialog) {
+        const wrapper = dialog.parentElement
+        if (wrapper) {
+          wrapper.classList.add('shift-picker-wrapper')
+          wrapper.style.pointerEvents = 'none'
+        }
+        dialog.style.pointerEvents = 'auto'
+        dialog.style.margin = '0'
+        dialog.style.transform = 'none'
+        dialog.style.left = `${coords.left}px`
+        dialog.style.top = `${coords.top}px`
+      }
+      return coords
+    },
+    lockBackgroundScroll() {
+      if (this.scrollLockDepth === 0) {
+        this.shiftPickerScrollLockY = window.scrollY || window.pageYOffset || 0
+        document.documentElement.classList.add('shift-picker-scroll-lock')
+        document.body.classList.add('shift-picker-scroll-lock')
+        document.body.style.top = `-${this.shiftPickerScrollLockY}px`
+        document.querySelectorAll('.schedule-scroll, .overview-matrix').forEach((el) => {
+          el.dataset.lockScrollTop = String(el.scrollTop)
+          el.classList.add('is-scroll-locked')
+        })
+        window.addEventListener('wheel', this.blockBackgroundWheel, { passive: false, capture: true })
+        window.addEventListener('touchmove', this.blockBackgroundWheel, { passive: false, capture: true })
+      }
+      this.scrollLockDepth += 1
+    },
+    unlockBackgroundScroll() {
+      if (this.scrollLockDepth <= 0) return
+      this.scrollLockDepth -= 1
+      if (this.scrollLockDepth > 0) return
+      window.removeEventListener('wheel', this.blockBackgroundWheel, { capture: true })
+      window.removeEventListener('touchmove', this.blockBackgroundWheel, { capture: true })
+      document.documentElement.classList.remove('shift-picker-scroll-lock')
+      document.body.classList.remove('shift-picker-scroll-lock')
+      document.body.style.top = ''
+      window.scrollTo(0, this.shiftPickerScrollLockY || 0)
+      document.querySelectorAll('.schedule-scroll.is-scroll-locked, .overview-matrix.is-scroll-locked').forEach((el) => {
+        const top = Number(el.dataset.lockScrollTop || 0)
+        el.classList.remove('is-scroll-locked')
+        el.scrollTop = top
+        delete el.dataset.lockScrollTop
+      })
+    },
+    blockBackgroundWheel(event) {
+      if (this.scrollLockDepth <= 0) return
+      if (event.target && event.target.closest && event.target.closest('.shift-picker-dialog')) return
+      event.preventDefault()
+    },
+    onShiftPickerOpened() {
+      this.applyShiftPickerCoords(this.shiftPickerAnchorEl)
+      this.$nextTick(() => {
+        this.applyShiftPickerCoords(this.shiftPickerAnchorEl)
+        this.shiftPickerReady = true
+      })
+    },
+    onShiftPickerOutside(event) {
+      if (!this.shiftPickerVisible) return
+      const target = event.target
+      const dialog = document.querySelector('.zn-shift-picker-dialog')
+      if (target && target.closest && target.closest('.shift-picker-control-popper')) return
+      if (target && target.closest && target.closest('.shift-picker-dialog')) return
+      if (dialog && dialog.contains(target)) return
+      if (this.shiftPickerAnchorEl && this.shiftPickerAnchorEl.contains(target)) return
+      this.shiftPickerVisible = false
+    },
+    applyPickerShiftToTarget(shiftId) {
+      if (!this.shiftPickerTarget || !this.shiftPickerTarget.row) return
+      this.$set(this.shiftPickerTarget.row.shifts, this.shiftPickerTarget.dateKey, shiftId)
+    },
+    shiftLabel(shiftId) {
+      if (shiftId === '休') return '休息'
+      const shift = this.resolveZnShiftRecord(shiftId)
+      return shift ? shift.name : shiftId
+    },
+    saveShiftPicker() {
+      if (!this.shiftPickerTarget) {
+        this.shiftPickerVisible = false
+        return
+      }
+      const stored = this.resolvePickerShiftValue()
+      if (!stored) {
+        this.showShiftPickerMessage('warning', '请至少选择1个班次')
+        return
+      }
+      const { row } = this.shiftPickerTarget
+      this.applyPickerShiftToTarget(stored)
+      this.shiftPickerVisible = false
+      this.showShiftPickerMessage('success', `已将 ${row.name} 的班次更新为 ${this.shiftLabel(stored)}`)
+    },
+    resetShiftPicker() {
+      document.removeEventListener('mousedown', this.onShiftPickerOutside, true)
+      while (this.scrollLockDepth > 0) this.unlockBackgroundScroll()
+      this.shiftPickerReady = false
+      this.shiftPickerTarget = null
+      this.shiftPickerAnchorEl = null
+      this.shiftPickerKeyword = ''
+      this.selectedPickerShiftIds = []
+      document.documentElement.style.removeProperty('--shift-picker-left')
+      document.documentElement.style.removeProperty('--shift-picker-top')
+      const wrapper = document.querySelector('.shift-picker-wrapper')
+      if (wrapper) {
+        wrapper.classList.remove('shift-picker-wrapper')
+        wrapper.style.pointerEvents = ''
+      }
     },
     cycleShiftStyle(shiftId) {
       if (!shiftId) {
@@ -1119,7 +1427,7 @@ export default {
         }
       }
       const style = resolveShiftChipStyle(this.findShift(shiftId))
-      const selectedBorder = style.color === '#FFFFFF' ? style.background : style.color
+      const selectedBorder = resolveShiftSelectedBorder(this.findShift(shiftId))
       return {
         '--cycle-shift-bg': style.background,
         '--cycle-shift-color': style.color,

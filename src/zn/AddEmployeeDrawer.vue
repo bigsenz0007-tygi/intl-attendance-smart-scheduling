@@ -264,7 +264,7 @@
                       <span>{{ day.week }}</span>
                     </div>
                     <div class="zn-add-employee-period-day__body">
-                      <span v-if="day.isRest" class="zn-add-employee-period-day__rest">休</span>
+                      <span v-if="day.isRest" class="zn-add-employee-period-day__rest" title="休息 00:00-23:59">休</span>
                       <span v-else class="overview-shift-chip is-regular zn-add-employee-period-day__shift" :style="previewShiftStyle(day.shift)" :title="`${day.shift.name} ${day.shift.time || ''}`">
                         <b>{{ day.shift.short || day.shift.name }}</b>
                       </span>
@@ -291,7 +291,7 @@
 
 <script>
 import { assetUrl } from '../utils/assetUrl'
-import { resolveShiftChipStyle, sortShiftsByFamily } from '../utils/shiftPalette'
+import { resolveShiftChipStyle, resolveShiftSelectedBorder, sortShiftsByFamily } from '../utils/shiftPalette'
 
 const ALL_EMPLOYEES = [
   { name: '张培', erp: 'zhangpei18', attendanceGroup: '异常处理组', position: '分拣员岗', gender: '女', empType: 'A', empTypeLabel: 'A-全日制劳动合同工' },
@@ -547,10 +547,10 @@ export default {
     },
     scheduleChipStyle(row, item = {}) {
       if (row.scheduleType === 'rotation') {
-        return { background: '#EDF2FF', color: '#3C6EF0', borderColor: '#C8D7FB' }
+        return { background: '#EDF2FF', color: '#3C6EF0', borderColor: '#C8D7FB', '--shift-selected-border': resolveShiftSelectedBorder(item, 'rotation') }
       }
       const style = resolveShiftChipStyle(item)
-      return { ...style, '--shift-selected-border': style.color === '#FFFFFF' ? style.background : style.color }
+      return { ...style, '--shift-selected-border': resolveShiftSelectedBorder(item) }
     },
     selectSchedule(row, item) {
       this.$set(row, 'scheduleId', item.id)

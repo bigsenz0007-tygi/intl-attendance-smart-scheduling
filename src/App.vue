@@ -4,7 +4,7 @@
     <header class="topbar">
       <div class="brand">
         <div class="brand-logo-group">
-          <img class="brand-logo-mark brand-logo-combined" :src="brandLogo" alt="京东物流" width="120" height="20">
+          <img class="brand-logo-mark brand-logo-combined" :src="brandLogo" alt="京东物流" width="35.1351" height="26">
         </div>
         <strong class="brand-title">考勤管理</strong>
       </div>
@@ -285,6 +285,7 @@
             v-for="shift in filteredPickerShifts"
             :key="shift.id"
             class="shift-picker-option"
+            :class="{ 'is-selected': selectedPickerShiftIds.includes(shift.id) }"
           >
             <el-checkbox
               :value="selectedPickerShiftIds.includes(shift.id)"
@@ -390,7 +391,7 @@ export default {
   },
   data() {
     return {
-      brandLogo: assetUrl('shell/jdl-logo-combined.svg'),
+      brandLogo: assetUrl('shell/jdl-logo-2024.svg'),
       viewMode: 'schedule-domestic',
       domesticScheduleContext: {
         department: 'tz-yz',
@@ -684,8 +685,7 @@ export default {
     },
     restCellStyle(selected = false) {
       if (!selected) return {}
-      const stroke = this.darkenHex('#A8AEB8', 0.08)
-      return { borderColor: stroke, boxShadow: `inset 0 0 0 2px ${stroke}` }
+      return resolveShiftChipStyle({ isRest: true }, true)
     },
     darkenHex(hex, amount = 0.08) {
       if (!hex || typeof hex !== 'string') return '#525765'

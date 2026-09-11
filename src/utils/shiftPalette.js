@@ -30,6 +30,15 @@ export const SHIFT_REST_VISUAL = {
   borderColor: '#E8E8E8',
 }
 
+export const SHIFT_SELECTED_BORDER = {
+  morning: '#008E62',
+  midday: '#EA7000',
+  night: '#3C6EF0',
+  rest: '#868D9F',
+  rotation: 'rgba(60, 110, 240, 0.5)',
+  empty: 'transparent',
+}
+
 export const SHIFT_COLOR_SWATCHES = [
   ...SHIFT_FAMILY_PALETTE.morning.swatches.map((background, index) => ({
     family: 'morning',
@@ -241,15 +250,25 @@ export function resolveShiftVisual(shift = {}) {
   }
 }
 
+export function resolveShiftSelectedBorder(shift = {}, type = 'shift') {
+  if (type === 'rotation') return SHIFT_SELECTED_BORDER.rotation
+  if (!shift || shift.isEmpty || shift.id === 'EMPTY' || shift.family === 'empty') return SHIFT_SELECTED_BORDER.empty
+  return SHIFT_SELECTED_BORDER[shiftFamilyOf(shift)] || SHIFT_SELECTED_BORDER.morning
+}
+
 export function resolveShiftChipStyle(shift = {}, selected = false) {
   const visual = resolveShiftVisual(shift)
+  const selectedBorder = resolveShiftSelectedBorder(shift)
   const style = {
     background: visual.background,
     color: visual.color,
     borderColor: visual.borderColor,
+    '--shift-selected-border': selectedBorder,
   }
   if (selected) {
-    style.boxShadow = `inset 0 0 0 2px ${visual.color === '#FFFFFF' ? 'rgba(0,0,0,.12)' : visual.color}`
+    style.border = selectedBorder === 'transparent' ? '1px solid transparent' : `1px solid ${selectedBorder}`
+    style.boxShadow = 'none'
+    style.outline = 'none'
   }
   return style
 }

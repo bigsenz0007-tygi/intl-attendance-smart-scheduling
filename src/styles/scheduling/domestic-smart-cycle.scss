@@ -1,10 +1,10 @@
 .domestic-smart-cycle-shift-card {
   position: relative;
   display: inline-flex;
-  flex: 0 0 148px;
-  width: 148px;
-  min-width: 148px;
-  max-width: 148px;
+  flex: 0 0 94px;
+  width: 94px;
+  min-width: 94px;
+  max-width: 94px;
   height: 40px;
   min-height: 40px;
   padding: 3px 10px;
@@ -17,8 +17,10 @@
   cursor: pointer;
 }
 
-/* 与排班倒班页的班次豆腐块保持 148px 等宽、40px 等高。 */
+/* 表格内填满当前班次单元格，并保持统一的 40px 高度。 */
 .domestic-smart-cycle-shift-card.is-empty {
+  flex: 1 1 0;
+  width: 100%;
   align-items: center;
   justify-content: center;
   border-color: rgba(60, 110, 240, 0.35);
@@ -55,10 +57,10 @@
 }
 
 .domestic-smart-cycle-popper .zn-rotation-option-card {
-  flex: 1 1 0;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
+  flex: 0 0 94px;
+  width: 94px;
+  min-width: 94px;
+  max-width: 94px;
   min-height: 40px;
   height: 40px;
   border: 1px solid transparent;
@@ -89,8 +91,9 @@
 }
 
 .domestic-smart-cycle-popper .el-select-dropdown__item.selected .zn-rotation-option-card {
-  border-color: var(--cycle-shift-selected-border, var(--cycle-shift-border));
+  border-color: var(--cycle-shift-selected-border, transparent);
   box-shadow: none;
+  outline: none;
 }
 
 .overseas-select-popper.domestic-smart-cycle-popper .el-select-dropdown__item.selected,
@@ -100,7 +103,14 @@
 }
 
 .domestic-smart-cycle-shift-card:focus-within {
-  box-shadow: 0 0 0 2px rgba(60, 110, 240, .24);
+  border-color: var(--cycle-shift-selected-border, transparent);
+  box-shadow: none;
+  outline: none;
+}
+
+.domestic-smart-cycle-shift-card.is-empty:focus-within {
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .domestic-smart-cycle-shift-card__label {

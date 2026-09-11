@@ -1,10 +1,46 @@
 /* 班次 / 轮班图例编辑与人员异常，仅作用于国内排班功能。 */
 .zn-shift-module .legend-chip--shift,
 .zn-shift-module .legend-chip--rotation {
-  width: max-content;
-  min-width: 0;
-  max-width: 100%;
+  flex: 0 0 94px;
+  width: 94px;
+  min-width: 94px;
+  max-width: 94px;
   cursor: pointer;
+}
+
+/* 班次图例保持上下结构、左边缘一致；跳班不再被多段时间撑宽。 */
+.zn-shift-module .overview-legend-row .legend {
+  align-content: flex-start;
+  align-items: flex-start;
+}
+
+.zn-shift-module .legend-chip--shift b,
+.zn-shift-module .legend-chip--shift small,
+.zn-shift-module .legend-chip--rotation b,
+.zn-shift-module .legend-chip--rotation small {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 班次图例统一占用同一列宽，换行后的每一列保持竖向左对齐。 */
+.overseas-schedule-root .zn-shift-module .overview-legend-block .legend-chip.legend-chip--shift {
+  flex: 0 0 94px !important;
+  width: 94px !important;
+  min-width: 94px !important;
+  max-width: 94px !important;
+}
+
+.overseas-schedule-root .zn-shift-module .overview-legend-block .legend-chip.legend-chip--shift[title*='(跳)'],
+.domestic-smart-step-two .overview-legend-block .legend-chip[title*='(跳)'] {
+  flex: 0 0 94px !important;
+  width: 94px !important;
+  min-width: 94px !important;
+  max-width: 94px !important;
 }
 
 /* 标签换行后仍从首个班次的位置起排，不回到“班次”标题下方。 */
@@ -20,9 +56,6 @@
 }
 
 .zn-shift-module .legend-chip--rotation {
-  width: 92px;
-  min-width: 92px;
-  max-width: 92px;
   border: 1px solid #c8d7fb;
   background: #e6edff;
   color: #3c6ef0;
@@ -34,26 +67,81 @@
   white-space: nowrap;
 }
 
-/* 班表豆腐块随单元格伸缩，四边统一预留 4px。 */
+/* 班表豆腐块四边统一预留 4px；具体宽度由精简/常规密度规则锁定。 */
 .zn-shift-module .overview-matrix tbody tr > td.overview-shift-cell {
   position: relative;
   padding: 4px;
 }
 
-.zn-shift-module .overview-matrix tbody tr > td.overview-shift-cell > .overview-shift-chip,
+.zn-shift-module .overview-matrix tbody tr > td.overview-shift-cell > .overview-shift-chip.is-regular,
 .zn-shift-module .overview-matrix tbody tr > td.overview-shift-cell > .rest-cell {
   position: static;
   inset: auto;
-  width: 100% !important;
+  width: max-content !important;
   min-width: 0 !important;
-  max-width: none !important;
+  max-width: 100% !important;
   max-height: none !important;
-  margin: 0;
+  margin: 0 auto;
 }
 
-.zn-shift-module .overview-matrix.density-normal tbody tr > td.overview-shift-cell > .overview-shift-chip.is-regular {
+.zn-shift-module .overview-matrix.density-normal tbody tr > td.overview-shift-cell > .overview-shift-chip.is-regular,
+.zn-shift-module .overview-matrix.density-normal tbody tr > td.overview-shift-cell > .rest-cell {
+  width: 94px !important;
+  min-width: 94px !important;
+  max-width: 94px !important;
   height: 40px !important;
   min-height: 40px !important;
+}
+
+/* 常规态“休息”保持 94×40，仅收窄 1px 横向内边距，完整容纳 00:00-23:59。 */
+.zn-shift-module .overview-matrix.density-normal tbody tr > td.overview-shift-cell > .overview-shift-chip.is-regular.is-rest-shift {
+  padding-right: 11px;
+  padding-left: 11px;
+}
+
+.zn-shift-module .overview-matrix.density-normal .overview-shift-chip.is-regular.is-rest-shift b,
+.zn-shift-module .overview-matrix.density-normal .overview-shift-chip.is-regular.is-rest-shift small {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* 精简态班次与“休”统一为 36×40；列宽同步固定为 40px，避免内容被压窄。 */
+.zn-shift-module .overview-matrix.density-compact table {
+  min-width: var(--schedule-compact-table-width, 1440px) !important;
+}
+
+.zn-shift-module .overview-matrix.density-compact tbody tr > td.overview-shift-cell > .overview-shift-chip.is-compact,
+.zn-shift-module .overview-matrix.density-compact tbody tr > td.overview-shift-cell > .rest-cell,
+.domestic-smart-board.overview-matrix.density-compact tbody tr > td.overview-shift-cell > .overview-shift-chip.is-compact,
+.domestic-smart-board.overview-matrix.density-compact tbody tr > td.overview-shift-cell > .rest-cell {
+  box-sizing: border-box;
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* 常规态额外锁定跳班宽度，名称/完整多段时间超长时省略。 */
+.zn-shift-module .overview-matrix.density-normal .overview-shift-chip.is-regular[title*='(跳)'],
+.domestic-smart-board .overview-shift-chip[title*='(跳)'] {
+  width: 94px !important;
+  min-width: 94px !important;
+  max-width: 94px !important;
+}
+
+.zn-shift-module .overview-shift-chip[title*='(跳)'] b,
+.zn-shift-module .overview-shift-chip[title*='(跳)'] small,
+.domestic-smart-board .overview-shift-chip[title*='(跳)'] b,
+.domestic-smart-board .overview-shift-chip[title*='(跳)'] small {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .zn-rotation-shift-popper.el-select-dropdown { width: 240px; }
@@ -68,9 +156,10 @@
   flex-direction: column;
   justify-content: center;
   box-sizing: border-box;
-  width: max-content;
-  min-width: 0;
-  max-width: 100%;
+  flex: 0 0 94px;
+  width: 94px;
+  min-width: 94px;
+  max-width: 94px;
   height: 40px;
   min-height: 40px;
   padding: 3px 10px;
@@ -82,13 +171,13 @@
 .zn-rotation-option-card strong,
 .zn-rotation-option-card span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .zn-rotation-option-card strong { font-weight: 500; }
-.zn-rotation-shift-popper .el-select-dropdown__item.selected .zn-rotation-option-card { box-shadow: inset 0 0 0 1px var(--shift-selected-border, currentColor); }
+.zn-rotation-shift-popper .el-select-dropdown__item.selected .zn-rotation-option-card { border: 1px solid var(--shift-selected-border, currentColor); box-shadow: none; outline: none; }
 
-.shift-picker-chip { flex: 0 0 auto; width: max-content; max-width: 100%; }
-.shift-picker-dialog.is-day .shift-picker-option .shift-picker-chip { flex: 1 1 0; width: 100%; max-width: 100%; }
+.shift-picker-chip { flex: 0 0 94px; width: 94px; min-width: 94px; max-width: 94px; }
+.shift-picker-dialog.is-day .shift-picker-option .shift-picker-chip { flex: 0 0 94px; width: 94px; min-width: 94px; max-width: 94px; }
 .shift-picker-option .el-checkbox__inner { width: 16px; height: 16px; border-width: 1px; border-radius: 4px; }
 .shift-picker-option .el-checkbox__inner::after { top: 2px; left: 5px; }
-.shift-picker-option.is-selected .shift-picker-chip { border-color: var(--shift-selected-border, currentColor) !important; box-shadow: none; }
+.shift-picker-option.is-selected .shift-picker-chip { border-color: var(--shift-selected-border, transparent) !important; box-shadow: none; outline: none; }
 
 .domestic-smart-cycle-shift .el-input__inner {
   border-color: var(--cycle-shift-border, #d9d9d9);
