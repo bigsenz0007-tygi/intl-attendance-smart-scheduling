@@ -2017,7 +2017,7 @@ body:has(.overseas-schedule-root.is-wizard-mode) {
 
 /* 下拉面板挂载在 body，使用专属 popper-class 保持 LUI PC3.0 状态闭环。 */
 .overseas-select-popper.el-select-dropdown {
-  margin: 0;
+  margin: 1px 0 0;
   padding: 4px 0;
   border: 0;
   border-radius: 8px;
@@ -6456,7 +6456,7 @@ body.shift-picker-scroll-lock {
 }
 
 .zn-shift-color-popper.el-popover {
-  min-width: 0;
+  min-width: 0; margin: 1px 0 0;
   padding: 8px;
   border-radius: 8px;
 }
