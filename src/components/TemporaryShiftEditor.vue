@@ -23,7 +23,20 @@
             :key="person.id"
             :label="`${person.name}（${person.code}）`"
             :value="person.id"
-          />
+          >
+            <span class="temporary-person-option">
+              <span
+                class="temporary-person-option__checkbox"
+                :class="{ 'is-checked': filterPersonIds.includes(person.id) }"
+                aria-hidden="true"
+              >
+                <svg v-if="filterPersonIds.includes(person.id)" viewBox="0 0 16 16" focusable="false">
+                  <path d="M3.5 8.2 6.6 11.2 12.5 4.8" />
+                </svg>
+              </span>
+              <span class="temporary-person-option__label">{{ person.name }}（{{ person.code }}）</span>
+            </span>
+          </el-option>
         </el-select>
       </label>
       <label class="temporary-shift-editor__filter">
@@ -334,7 +347,7 @@ export default {
   display: flex;
   align-items: center;
   height: 40px;
-  padding: 0 12px 0 40px;
+  padding: 0 12px;
   border-radius: 0;
   background: #fff;
   color: #23252b;
@@ -345,44 +358,13 @@ export default {
 .temporary-person-select-popper.overseas-select-popper.el-select-dropdown .el-select-dropdown__item:hover,
 .temporary-person-select-popper.overseas-select-popper.el-select-dropdown .el-select-dropdown__item.selected.hover,
 .temporary-person-select-popper.overseas-select-popper.el-select-dropdown .el-select-dropdown__item.selected:hover { background: #f5f5f6; color: #23252b; }
-.temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item::before {
-  position: absolute;
-  top: 50% !important;
-  left: 12px !important;
-  box-sizing: border-box;
-  width: 16px !important;
-  height: 16px !important;
-  border: 1px solid #d9d9d9 !important;
-  border-radius: 4px !important;
-  background: #fff !important;
-  content: '';
-  pointer-events: none;
-  transform: translateY(-50%) !important;
-}
-.temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item.selected::before { border-color: #3c6ef0 !important; background: #3c6ef0 !important; }
-.temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item::after {
-  position: absolute;
-  top: calc(50% - 4px) !important;
-  right: auto !important;
-  bottom: auto !important;
-  left: 18px !important;
-  display: block !important;
-  box-sizing: border-box;
-  width: 4px !important;
-  height: 8px !important;
-  margin: 0 !important;
-  border: solid transparent !important;
-  border-width: 0 2px 2px 0 !important;
-  content: '' !important;
-  font-size: 0 !important;
-  line-height: 0 !important;
-  pointer-events: none;
-  transform: rotate(45deg) !important;
-  transform-origin: center !important;
-}
-.temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after {
-  border-color: #fff !important;
-}
+.temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item::after { display: none !important; content: none !important; }
+.temporary-person-option { display: flex; width: 100%; height: 100%; min-width: 0; align-items: center; gap: 12px; }
+.temporary-person-option__checkbox { display: inline-flex; width: 16px; height: 16px; flex: 0 0 16px; align-items: center; justify-content: center; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; }
+.temporary-person-option__checkbox.is-checked { border-color: #3c6ef0; background: #3c6ef0; }
+.temporary-person-option__checkbox svg { display: block; width: 14px; height: 14px; overflow: visible; }
+.temporary-person-option__checkbox path { fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.temporary-person-option__label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 20px; }
 
 .temporary-shift-time-popper.el-time-range-picker {
   width: 354px;
