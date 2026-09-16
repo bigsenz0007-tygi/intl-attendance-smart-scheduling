@@ -51,19 +51,22 @@
         @open-smart-schedule="openDomesticSmartSchedule"
       />
 
-      <ScheduleOverview
+      <div
         v-else-if="viewMode === 'schedule-intl'"
-        :dates="displayDates"
-        :shifts="shifts"
-        :scheduleRows="scheduleRows"
-        :picker-open="shiftPickerVisible"
-        :picker-anchor="shiftPickerTarget"
-        :initial-context="intlScheduleContext"
-        @start-scheduling="openIntlSmartSchedule"
-        @query-schedule="handleIntlScheduleQuery"
-        @replace-shift="openShiftPicker"
-        @open-auto-config="autoDialogVisible = true"
-      />
+        class="intl-repo-scope"
+      >
+        <div class="smart-schedule-page is-overview">
+          <IntlScheduleOverview
+            :dates="intlDates"
+            :shifts="intlShifts"
+            :schedule-rows="intlScheduleRows"
+            :picker-open="shiftPickerVisible"
+            :picker-anchor="shiftPickerTarget"
+            @start-scheduling="openIntlSmartSchedule"
+            @replace-shift="openShiftPicker"
+          />
+        </div>
+      </div>
 
       <DomesticSmartWizard
         v-else-if="viewMode === 'smart-domestic'"
@@ -72,169 +75,12 @@
         @published="openScheduleDomestic"
       />
 
-      <section v-else-if="viewMode === 'smart-intl'" class="wizard-card">
-        <div class="arrow-steps-card">
-          <div class="arrow-steps" role="list" aria-label="智能排班流程">
-            <div
-              v-for="(step, index) in workflowSteps"
-              :key="step.title"
-              class="arrow-step"
-              :class="{
-                'is-active': index === activeStep,
-                'is-complete': index < activeStep,
-                'is-pending': index > activeStep,
-                'is-start': index === 0,
-                'is-end': index === workflowSteps.length - 1,
-              }"
-              role="listitem"
-              :aria-current="index === activeStep ? 'step' : null"
-              tabindex="0"
-              @click="goToStep(index)"
-              @keydown.enter.prevent="goToStep(index)"
-            >
-              <span class="arrow-step__skin" aria-hidden="true">
-                <i class="arrow-step__cap arrow-step__cap--l"></i>
-                <i class="arrow-step__body"></i>
-                <i class="arrow-step__cap arrow-step__cap--r"></i>
-              </span>
-              <span class="arrow-step__num" aria-hidden="true">{{ index + 1 }}</span>
-              <span class="arrow-step__label">
-                <img
-                  class="arrow-step__icon"
-                  :src="stepStateIcon(index)"
-                  alt=""
-                />
-                <strong>{{ step.title }}</strong>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <section v-if="activeStep === 0" class="wizard-panel step-two">
-          <div class="schedule-detail-title">
-            <span aria-hidden="true">✦</span>
-            <strong>智能排班｜出勤工时/人数详情</strong>
-          </div>
-          <div class="selection-summary">
-            <span class="summary-item"><span class="summary-label">排班部门：</span><strong>{{ selectedDepartmentLabel }}</strong></span>
-            <span class="summary-item"><span class="summary-label">环节组：</span><strong>{{ selectedProcessLabel }}</strong></span>
-          </div>
-          <ForecastMatrix :dates="dates" :rows="visibleForecastRows" @target-change="onTargetChange" />
-        </section>
-
-        <section v-else class="wizard-panel step-three">
-          <div class="schedule-detail-title">
-            <span aria-hidden="true">✦</span>
-            <strong>智能排班｜出勤表详情</strong>
-          </div>
-          <div class="selection-summary">
-            <span class="summary-item"><span class="summary-label">排班部门：</span><strong>{{ selectedDepartmentLabel }}</strong></span>
-            <span class="summary-item"><span class="summary-label">环节组：</span><strong>{{ selectedProcessLabel }}</strong></span>
-          </div>
-          <SchedulingList :dates="displayDates" :editable="true">
-            <div class="schedule-scroll">
-              <table class="schedule-table">
-                <thead>
-                  <tr>
-                    <th class="person-col">
-                      <div class="schedule-person-header">
-                        <div
-                          class="schedule-search"
-                          :class="{ 'is-empty': isScheduleSearchEmpty }"
-                        >
-                          <el-input
-                            ref="scheduleSearchInput"
-                            v-model="scheduleKeyword"
-                            clearable
-                            prefix-icon="el-icon-search"
-                            placeholder="搜索人员"
-                            @focus="scheduleSearchFocused = true"
-                            @blur="scheduleSearchFocused = false"
-                          ></el-input>
-                        </div>
-                      </div>
-                    </th>
-                    <th v-for="date in displayDates" :key="date.key"><strong>{{ date.label }}</strong><span>{{ date.week }}</span></th>
-                  </tr>
-                </thead>
-                <tbody class="schedule-summary-body">
-                  <tr>
-                    <th>实排工时/推荐工时</th>
-                    <td v-for="date in displayDates" :key="'hours-' + date.key">
-                      <button class="daily-compare" @click="hoursDetailVisible = true">
-                        <span class="compare-ratio">{{ dailyHoursActual[dateMetricIndex(date)] }}/{{ dailyHoursRecommended[dateMetricIndex(date)] }}</span>
-                        <em
-                          class="compare-diff"
-                          :class="{ danger: dailyHoursActual[dateMetricIndex(date)] !== dailyHoursRecommended[dateMetricIndex(date)] }"
-                        >
-                          <b>{{ signedDiff(dailyHoursActual[dateMetricIndex(date)] - dailyHoursRecommended[dateMetricIndex(date)]) }}</b><small>h</small>
-                        </em>
-                        <shell-icon name="chevronRight" size="sm" />
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>预测核算工时</th>
-                    <td v-for="date in displayDates" :key="'forecast-' + date.key">
-                      <span class="daily-forecast">{{ dailyHoursForecast[dateMetricIndex(date)] }}</span>
-                    </td>
-                  </tr>
-                </tbody>
-                <tbody>
-                  <tr v-if="filteredScheduleRows.length === 0">
-                    <td :colspan="displayDates.length + 1" class="schedule-empty-cell">
-                      <div class="search-empty-state">
-                        <div class="search-empty-illus" aria-hidden="true">
-                          <img class="search-empty-shadow" :src="assetUrl('empty-state/empty-shadow.svg')" alt="" width="50" height="16" />
-                          <img class="search-empty-doc" :src="assetUrl('empty-state/empty-doc.svg')" alt="" width="36" height="30" />
-                        </div>
-                        <p>暂无搜索结果</p>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr v-for="row in filteredScheduleRows" :key="row.id">
-                    <td class="person-cell">
-                      <div class="person-info">
-                        <strong>{{ row.name }}</strong>
-                        <small>{{ row.code }}</small>
-                      </div>
-                    </td>
-                    <td v-for="date in displayDates" :key="date.key" class="shift-cell">
-                      <button
-                        v-if="row.shifts[date.key] !== '休'"
-                        class="shift-chip"
-                        :class="{ 'is-picker-active': isPickerAnchor(row, date.key) }"
-                        :style="shiftStyle(row.shifts[date.key], isPickerAnchor(row, date.key))" :title="`${shiftName(row.shifts[date.key])} ${formatShiftRange(shiftFullTime(row.shifts[date.key]))}`"
-                        @dblclick.stop.prevent="openShiftPicker(row, date.key, $event)"
-                      >
-                        <b>{{ shiftName(row.shifts[date.key]) }}</b>
-                        <small>{{ formatShiftRange(shiftFullTime(row.shifts[date.key])) }}</small>
-                      </button>
-                      <span
-                        v-else
-                        class="rest-cell"
-                        :class="{ 'is-picker-active': isPickerAnchor(row, date.key) }"
-                        :style="restCellStyle(isPickerAnchor(row, date.key))"
-                        @dblclick.stop.prevent="openShiftPicker(row, date.key, $event)"
-                      >休</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </SchedulingList>
-        </section>
-      </section>
-
-      <footer
-        v-if="isWizardView"
-        class="flow-actions wizard-flow-actions"
-      >
-        <el-button @click="cancelWizard">取消</el-button>
-        <el-button v-if="activeStep > 0" @click="previousStep">上一步</el-button>
-        <el-button v-if="activeStep === 0" type="primary" @click="nextStep">下一步</el-button>
-        <el-button v-else type="primary" icon="el-icon-s-promotion" @click="publishSchedule">发布班表</el-button>
-      </footer>
+      <div v-else-if="viewMode === 'smart-intl'" class="intl-repo-scope intl-smart-wizard-scope">
+        <IntlSmartSchedule
+          initial-view-mode="wizard"
+          @request-overview="openScheduleIntl"
+        />
+      </div>
     </main>
 
     <el-dialog
@@ -244,7 +90,7 @@
       :close-on-click-modal="false"
       :destroy-on-close="false"
       append-to-body
-      width="500px"
+      width="640px"
       top="0"
       @opened="onShiftPickerOpened"
       @closed="resetShiftPicker"
@@ -256,21 +102,14 @@
           class="shift-picker-tab"
           :class="{ 'is-active': shiftPickerTab === 'day' }"
           @click="selectShiftPickerTab('day')"
-        >按班次排</button>
+        >按天排班</button>
         <button
           type="button"
           role="tab"
           class="shift-picker-tab"
           :class="{ 'is-active': shiftPickerTab === 'cycle' }"
           @click="selectShiftPickerTab('cycle')"
-        >按轮班排</button>
-        <button
-          type="button"
-          role="tab"
-          class="shift-picker-tab"
-          :class="{ 'is-active': shiftPickerTab === 'temporary' }"
-          @click="selectShiftPickerTab('temporary')"
-        >修改临时排班</button>
+        >周期排班</button>
       </div>
       <div class="shift-picker-body">
         <el-input
@@ -305,17 +144,10 @@
           <el-switch v-model="shiftPickerCycleApplyAll" />
           <span>从当前选中日期开始，应用到当前全部时间范围</span>
         </div>
-        <temporary-shift-editor
-          v-else
-          v-model="temporaryShiftForm"
-          :shift-name="temporaryShiftBase.name"
-        />
       </div>
       <span slot="footer" class="shift-picker-footer">
         <el-button @click="shiftPickerVisible = false">取消</el-button>
-        <el-button v-if="shiftPickerTab === 'day'" @click="clearPickerShifts">清空</el-button>
-        <el-button v-else-if="shiftPickerTab === 'cycle'" @click="clearCyclePicker">清空</el-button>
-        <el-button type="primary" @click="saveShiftPicker">{{ shiftPickerTab === 'temporary' ? '确定' : '保存' }}</el-button>
+        <el-button type="primary" @click="saveShiftPicker">保存</el-button>
       </span>
     </el-dialog>
 
@@ -354,9 +186,8 @@
 </template>
 
 <script>
-import ForecastMatrix from './components/ForecastMatrix.vue'
-import ScheduleOverview from './components/ScheduleOverview.vue'
-import TemporaryShiftEditor from './components/TemporaryShiftEditor.vue'
+import IntlSmartSchedule from './intl-synced/Index.vue'
+import IntlScheduleOverview from './intl-synced/components/ScheduleOverview.vue'
 import ZnShiftModule from './zn/ZnShiftModule.vue'
 import DomesticSmartWizard from './zn/DomesticSmartWizard.vue'
 import AppSidebar from './components/shell/AppSidebar.vue'
@@ -364,6 +195,7 @@ import AppQuickMenuTabs from './components/shell/AppQuickMenuTabs.vue'
 import ShellIcon from './components/shell/ShellIcon.vue'
 import { assetUrl } from './utils/assetUrl'
 import { dates, forecastRows, shifts, scheduleRows } from './data/mock'
+import { dates as intlDates, shifts as intlShifts, scheduleRows as intlScheduleRows } from './intl-synced/mock'
 import pageFullscreen from './mixins/workspaceFullscreen'
 import { resolveShiftChipStyle, decorateShift } from './utils/shiftPalette'
 
@@ -377,9 +209,8 @@ export default {
   name: 'App',
   mixins: [pageFullscreen],
   components: {
-    ForecastMatrix,
-    ScheduleOverview,
-    TemporaryShiftEditor,
+    IntlSmartSchedule,
+    IntlScheduleOverview,
     ZnShiftModule,
     DomesticSmartWizard,
     AppSidebar,
@@ -392,6 +223,9 @@ export default {
   data() {
     return {
       brandLogo: assetUrl('shell/jdl-logo-2024.svg'),
+      intlDates,
+      intlShifts,
+      intlScheduleRows,
       viewMode: 'schedule-domestic',
       domesticScheduleContext: {
         department: 'tz-yz',
@@ -481,6 +315,9 @@ export default {
     }
   },
   computed: {
+    activeBrandLogo() {
+      return this.brandLogo
+    },
     isWizardView() {
       return this.viewMode === 'smart-intl'
     },
@@ -530,7 +367,7 @@ export default {
     },
     filteredPickerShifts() {
       const keyword = this.shiftPickerKeyword.trim().toLowerCase()
-      return this.shifts.filter((shift) => {
+      return this.intlShifts.filter((shift) => {
         if (!keyword) return true
         return `${shift.name} ${shift.time}`.toLowerCase().includes(keyword)
       })
@@ -539,6 +376,7 @@ export default {
       return [
         'shift-picker-dialog',
         'app-shift-picker-dialog',
+        'intl-shift-picker-dialog',
         this.shiftPickerReady ? 'is-ready' : '',
       ].filter(Boolean).join(' ')
     },
@@ -547,7 +385,7 @@ export default {
       const { row, dateKey } = this.shiftPickerTarget
       const shiftId = row && row.shifts ? row.shifts[dateKey] : null
       if (shiftId === '休' || shiftId === 'REST') return { name: '休息', time: '00:00-23:59', isRest: true }
-      return this.shifts.find((shift) => shift.id === shiftId) || { name: '--', time: '' }
+      return this.intlShifts.find((shift) => shift.id === shiftId) || { name: '--', time: '' }
     },
   },
   watch: {
@@ -719,11 +557,25 @@ export default {
       return shift ? shift.time : ''
     },
     pickerChipStyle(shift) {
-      return resolveShiftChipStyle(shift)
+      const selected = this.selectedPickerShiftIds.includes(shift.id)
+      let style
+      if (shift.isRest) {
+        style = { background: shift.light, color: '#525765', borderColor: '#D9D9D9' }
+      } else if (shift.outlined) {
+        style = { background: shift.light, color: shift.color, borderColor: shift.color }
+      } else {
+        style = { background: shift.color, color: '#fff', borderColor: shift.color }
+      }
+      if (selected) {
+        const stroke = this.darkenHex(shift.color || '#A8AEB8', 0.12)
+        style.borderColor = stroke
+        style.boxShadow = `inset 0 0 0 1px ${stroke}`
+      }
+      return style
     },
     resolvePickerShiftStored(shiftId) {
       if (!shiftId) return '休'
-      const shift = this.shifts.find((item) => item.id === shiftId)
+      const shift = this.intlShifts.find((item) => item.id === shiftId)
       return shift && shift.isRest ? '休' : shiftId
     },
     applyPickerShiftToTarget(shiftId) {
@@ -731,7 +583,7 @@ export default {
       const { row, dateKey } = this.shiftPickerTarget
       this.$set(row.shifts, dateKey, this.resolvePickerShiftStored(shiftId))
     },
-    calcShiftPickerCoords(anchorEl, dialogWidth = 500, dialogHeight = 520) {
+    calcShiftPickerCoords(anchorEl, dialogWidth = 640, dialogHeight = 520) {
       const viewportPadding = 16
       const anchorGap = 12
       const maxLeft = Math.max(viewportPadding, window.innerWidth - dialogWidth - viewportPadding)
@@ -757,7 +609,7 @@ export default {
     },
     applyShiftPickerCoords(anchorEl, measuredDialog) {
       const dialog = measuredDialog || document.querySelector('.app-shift-picker-dialog')
-      const dialogWidth = (dialog && dialog.offsetWidth) || Math.min(500, window.innerWidth - 32)
+      const dialogWidth = (dialog && dialog.offsetWidth) || Math.min(640, window.innerWidth - 32)
       const dialogHeight = (dialog && dialog.offsetHeight) || 520
       const coords = this.calcShiftPickerCoords(anchorEl, dialogWidth, dialogHeight)
       document.documentElement.style.setProperty('--shift-picker-left', `${coords.left}px`)

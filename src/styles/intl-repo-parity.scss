@@ -1,0 +1,346 @@
+/* 国际考勤本地预览隔离层：复用 ui-0727 样式，避免国内排班规则覆盖。 */
+.intl-repo-scope {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  color: #333;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+
+  @import '../intl-synced/styles/smart-schedule.scss';
+
+  /* 清除国内排班全局样式遗留，只在国际考勤预览范围内恢复 ui-0727 表现。 */
+  .smart-schedule-page {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 100%;
+    height: calc(100vh - 100px);
+    min-height: 640px;
+    padding: 12px 16px 0;
+    overflow: hidden;
+    background: #f3f5f8;
+    color: inherit;
+    font-family: inherit;
+    line-height: inherit;
+  }
+
+  .smart-schedule-page.is-overview {
+    height: auto;
+    min-height: calc(100vh - 100px);
+    padding: 0;
+    overflow: visible;
+    background: #f5f5f6;
+  }
+
+  .smart-schedule-page.is-overview .schedule-overview {
+    margin-top: 0;
+  }
+
+  .smart-schedule-page .overview-tabs-row {
+    gap: normal;
+  }
+
+  .smart-schedule-page .overview-legend-row .legend {
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  .smart-schedule-page .overview-legend-block:not(.is-expanded) .overview-legend-row .legend {
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  .smart-schedule-page .overview-legend-block .legend-chip,
+  .smart-schedule-page .overview-legend-block .legend-chip.is-rest {
+    flex: 0 0 auto !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: normal;
+    box-sizing: border-box;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 0 12px;
+    gap: normal;
+    overflow: visible;
+    border: 1px solid transparent;
+    line-height: 18px;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+
+  .smart-schedule-page .overview-legend-row .legend-add-btn .el-icon-plus {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+    line-height: 14px;
+  }
+
+  .smart-schedule-page .overview-toolbar {
+    flex-wrap: nowrap;
+  }
+
+  .smart-schedule-page .overview-matrix {
+    position: static;
+    border-right: 1px solid #e2e6ed;
+    border-bottom: 1px solid #e2e6ed;
+    background: transparent;
+  }
+
+  .smart-schedule-page .overview-date-col.is-weekend:not(.is-today) {
+    background: #f7f8fa;
+  }
+
+  .smart-schedule-page .overview-shift-cell.is-weekend {
+    background: #fff;
+  }
+
+  .smart-schedule-page .overview-matrix::before,
+  .smart-schedule-page .overview-matrix::after {
+    display: none;
+    content: none;
+  }
+
+  .smart-schedule-page .overview-shift-chip {
+    gap: normal;
+    overflow: visible;
+    line-height: normal;
+  }
+
+  .smart-schedule-page .overview-person-header,
+  .smart-schedule-page .schedule-person-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .smart-schedule-page .overview-search,
+  .smart-schedule-page .schedule-search {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  /* 国际总览会命中国内搜索框的固定宽度规则；内层输入必须跟随外层铺满。 */
+  .smart-schedule-page th.overview-person-col .overview-search .el-input__inner {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100%;
+  }
+
+  .smart-schedule-page .overview-search .el-input__prefix {
+    top: 0;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    transform: translateY(-2px) !important;
+  }
+
+  .smart-schedule-page .overview-search .el-input__prefix .el-input__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 14px;
+  }
+
+  .smart-schedule-page .schedule-search.is-empty .el-input__inner,
+  .smart-schedule-page .schedule-search.is-empty .el-input__inner::placeholder {
+    padding-right: 0;
+    padding-left: 0;
+    text-align: center;
+    text-indent: 22px;
+  }
+
+  .smart-schedule-page .schedule-search.is-empty .el-input__prefix {
+    left: calc(50% - 39px);
+  }
+
+  /* 国际排班倒班人员列：覆盖国内全局的 max-content 居中规则。 */
+  .smart-schedule-page .overview-person-cell,
+  .smart-schedule-page .overview-matrix tbody tr > td.overview-person-cell {
+    text-align: left;
+  }
+
+  .smart-schedule-page .overview-person-cell > div {
+    width: 100%;
+    margin: 0;
+    text-align: left;
+  }
+
+  .smart-schedule-page .overview-shift-chip,
+  .smart-schedule-page .shift-chip {
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  }
+
+  .smart-schedule-page .overview-shift-chip:hover,
+  .smart-schedule-page .shift-chip:hover {
+    border-width: 1px !important;
+    border-color: var(--shift-hover-border) !important;
+    box-shadow: inset 0 0 0 1px var(--shift-hover-border) !important;
+  }
+
+  .smart-schedule-page .overview-matrix.density-compact tbody tr > td.overview-shift-cell {
+    position: relative;
+    padding: 0;
+  }
+
+  .smart-schedule-page .overview-shift-chip.is-compact {
+    position: absolute;
+    inset: 4px;
+    width: auto;
+    max-width: none;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    gap: normal;
+    overflow: visible;
+  }
+
+  .smart-schedule-page .overview-shift-chip.is-compact b {
+    line-height: 18px;
+  }
+}
+
+/* 国际智能排班弹窗会 append 到 body；用独立 class 隔离国内 94px 班次块规则。 */
+body .el-dialog.intl-shift-picker-dialog .shift-picker-chip {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 32px !important;
+  max-height: none !important;
+  overflow: hidden;
+}
+
+body .el-dialog.intl-shift-picker-dialog .shift-picker-chip b {
+  flex: 1 1 auto;
+  width: auto !important;
+  min-width: 0;
+  max-width: none !important;
+}
+
+body .el-dialog.intl-shift-picker-dialog .shift-picker-chip small {
+  flex: 0 0 auto;
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* 智能排班（国际）：主体外间距 16px，底栏与菜单/页面边界无缝衔接。 */
+.intl-repo-scope.intl-smart-wizard-scope {
+  align-self: stretch;
+  margin-right: -16px;
+  margin-left: -16px;
+
+  .smart-schedule-page {
+    padding: 16px 16px 0;
+  }
+
+  .smart-schedule-page .wizard-card {
+    margin-top: 0;
+  }
+
+  .smart-schedule-page .wizard-card .selection-summary {
+    margin-bottom: 16px !important;
+  }
+
+  /* 仅国际智能排班步骤二：搜索图标固定靠左，不参与空态居中。 */
+  .smart-schedule-page .step-three .schedule-search.is-empty .el-input__prefix {
+    left: 10px;
+  }
+
+  .smart-schedule-page .step-three .schedule-search.is-empty .el-input__inner {
+    padding-right: 28px;
+    padding-left: 28px;
+    text-align: left;
+    text-indent: 0;
+  }
+
+  .smart-schedule-page .step-three .schedule-search.is-empty .el-input__inner::placeholder {
+    padding: 0;
+    text-align: left;
+    text-indent: 0;
+  }
+
+  /* 默认与 hover 显示“搜索人员”，图标（14px）和文字保持 4px 间距。 */
+  .smart-schedule-page .step-three .schedule-search .el-input__inner::placeholder,
+  .smart-schedule-page .step-three .schedule-search:hover .el-input__inner::placeholder {
+    visibility: visible !important;
+    color: #868d9f !important;
+    -webkit-text-fill-color: #868d9f;
+    opacity: 1 !important;
+  }
+
+  /* focus 时隐藏 placeholder，保留输入光标和搜索图标。 */
+  .smart-schedule-page .step-three .schedule-search .el-input__inner:focus::placeholder {
+    visibility: hidden !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent;
+    opacity: 0 !important;
+  }
+
+  .smart-schedule-page .arrow-steps-card {
+    height: 72px;
+  }
+
+  .smart-schedule-page .arrow-steps,
+  .smart-schedule-page .arrow-step,
+  .smart-schedule-page .arrow-step__body,
+  .smart-schedule-page .arrow-step__cap {
+    height: 40px;
+  }
+
+  .smart-schedule-page .wizard-flow-actions {
+    width: calc(100% + 32px);
+    margin: 16px -16px 0;
+  }
+
+  /* 边框由固定外层绘制，滚动表格始终裁切在 8px 圆角内。 */
+  .smart-schedule-page .matrix-frame,
+  .smart-schedule-page .scheduling-list-adapter {
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    contain: paint;
+    border: 1px solid transparent !important;
+    border-radius: 8px;
+  }
+
+  .smart-schedule-page .matrix-frame::after,
+  .smart-schedule-page .scheduling-list-adapter::after {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: block;
+    box-sizing: border-box;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    content: '';
+    pointer-events: none;
+  }
+
+  .smart-schedule-page .matrix-scroll,
+  .smart-schedule-page .schedule-scroll {
+    min-width: 0;
+    max-width: 100%;
+    border: 0 !important;
+    border-radius: 0;
+  }
+
+  /* 外框已提供描边，末列和末行不再重复叠加边线。 */
+  .smart-schedule-page .forecast-table tr > :last-child,
+  .smart-schedule-page .schedule-table tr > :last-child {
+    border-right: 0 !important;
+  }
+
+  .smart-schedule-page .forecast-table tbody:last-child tr:last-child > *,
+  .smart-schedule-page .schedule-table tbody:last-child tr:last-child > * {
+    border-bottom: 0 !important;
+  }
+}

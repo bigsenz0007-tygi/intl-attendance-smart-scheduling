@@ -12,6 +12,7 @@ import './styles/scheduling/legend-editing.scss'
 import './styles/scheduling/domestic-smart-cycle.scss'
 import './styles/scheduling/rotation-day-picker.scss'
 import './styles/scheduling/viewport-layout.scss'
+import './styles/intl-repo-parity.scss'
 
 Vue.use(LuiUI)
 installFieldTooltipGuard(Vue)
