@@ -358,6 +358,7 @@ export default {
 .temporary-person-select-popper.overseas-select-popper.el-select-dropdown .el-select-dropdown__item:hover,
 .temporary-person-select-popper.overseas-select-popper.el-select-dropdown .el-select-dropdown__item.selected.hover,
 .temporary-person-select-popper.overseas-select-popper.el-select-dropdown .el-select-dropdown__item.selected:hover { background: #f5f5f6; color: #23252b; }
+.temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item::before,
 .temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item::after { display: none !important; content: none !important; }
 .temporary-person-option { display: flex; width: 100%; height: 100%; min-width: 0; align-items: center; gap: 12px; }
 .temporary-person-option__checkbox { display: inline-flex; width: 16px; height: 16px; flex: 0 0 16px; align-items: center; justify-content: center; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; }
