@@ -135,7 +135,7 @@
             >
               <img
                 class="btn-smart-schedule__icon"
-                src="/assets/smart-schedule/ai-icon-data2.png"
+                :src="assetUrl('smart-schedule/ai-icon-data2.png')"
                 alt=""
                 width="16"
                 height="16"
@@ -164,7 +164,7 @@
               aria-label="快捷键说明"
               @click="notify('已打开快捷键说明')"
             >
-              <img class="overview-toolbar-icon" src="/assets/lui-icon-help.svg" alt="" width="16" height="16" />
+              <img class="overview-toolbar-icon" :src="assetUrl('lui-icon-help.svg')" alt="" width="16" height="16" />
             </button>
           </el-tooltip>
           <el-tooltip content="全屏" placement="top" popper-class="lui-pc-tooltip">
@@ -174,7 +174,7 @@
               aria-label="全屏"
               @click="notify('已进入全屏')"
             >
-              <img class="overview-toolbar-icon" src="/assets/lui-icon-fullscreen.svg" alt="" width="16" height="16" />
+              <img class="overview-toolbar-icon" :src="assetUrl('lui-icon-fullscreen.svg')" alt="" width="16" height="16" />
             </button>
           </el-tooltip>
         </div>
@@ -225,8 +225,8 @@
               <td :colspan="overviewDates.length + 3" class="overview-empty-cell">
                 <div class="search-empty-state">
                   <div class="search-empty-illus" aria-hidden="true">
-                    <img class="search-empty-shadow" src="/assets/empty-state/empty-shadow.svg" alt="" width="50" height="16" />
-                    <img class="search-empty-doc" src="/assets/empty-state/empty-doc.svg" alt="" width="36" height="30" />
+                    <img class="search-empty-shadow" :src="assetUrl('empty-state/empty-shadow.svg')" alt="" width="50" height="16" />
+                    <img class="search-empty-doc" :src="assetUrl('empty-state/empty-doc.svg')" alt="" width="36" height="30" />
                   </div>
                   <p>暂无搜索结果</p>
                 </div>
@@ -286,6 +286,8 @@
 </template>
 
 <script>
+import { assetUrl } from '../../utils/assetUrl'
+
 const WEEK_FULL = ['日', '一', '二', '三', '四', '五', '六']
 const TODAY_KEY = '07-23'
 
@@ -361,6 +363,7 @@ export default {
     },
   },
   methods: {
+    assetUrl,
     notify(message) { this.$message.success(message) },
     startSmartTipIntro() {
       this.clearSmartTipIntro()

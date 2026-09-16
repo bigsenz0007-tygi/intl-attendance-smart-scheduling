@@ -1174,26 +1174,26 @@
 
 .smart-schedule-page .arrow-step.is-start .arrow-step__cap--l {
   width: 8px;
-  -webkit-mask-image: url("/assets/figma-stepper/mask-start-left.svg");
-  mask-image: url("/assets/figma-stepper/mask-start-left.svg");
+  -webkit-mask-image: url("#{$public-path}assets/figma-stepper/mask-start-left.svg");
+  mask-image: url("#{$public-path}assets/figma-stepper/mask-start-left.svg");
 }
 
 .smart-schedule-page .arrow-step.is-start .arrow-step__cap--r {
   width: 20px;
-  -webkit-mask-image: url("/assets/figma-stepper/mask-tip-right.svg");
-  mask-image: url("/assets/figma-stepper/mask-tip-right.svg");
+  -webkit-mask-image: url("#{$public-path}assets/figma-stepper/mask-tip-right.svg");
+  mask-image: url("#{$public-path}assets/figma-stepper/mask-tip-right.svg");
 }
 
 .smart-schedule-page .arrow-step.is-end .arrow-step__cap--l {
   width: 20px;
-  -webkit-mask-image: url("/assets/figma-stepper/mask-end-left.svg");
-  mask-image: url("/assets/figma-stepper/mask-end-left.svg");
+  -webkit-mask-image: url("#{$public-path}assets/figma-stepper/mask-end-left.svg");
+  mask-image: url("#{$public-path}assets/figma-stepper/mask-end-left.svg");
 }
 
 .smart-schedule-page .arrow-step.is-end .arrow-step__cap--r {
   width: 8px;
-  -webkit-mask-image: url("/assets/figma-stepper/mask-end-right.svg");
-  mask-image: url("/assets/figma-stepper/mask-end-right.svg");
+  -webkit-mask-image: url("#{$public-path}assets/figma-stepper/mask-end-right.svg");
+  mask-image: url("#{$public-path}assets/figma-stepper/mask-end-right.svg");
 }
 
 .smart-schedule-page .arrow-step__num {

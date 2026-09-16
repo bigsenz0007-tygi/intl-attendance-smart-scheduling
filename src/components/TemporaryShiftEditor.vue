@@ -362,14 +362,14 @@ export default {
 .temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item.selected::before { border-color: #3c6ef0 !important; background: #3c6ef0 !important; }
 .temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item::after {
   position: absolute;
-  top: calc(50% - 6px) !important;
+  top: calc(50% - 4px) !important;
   right: auto !important;
   bottom: auto !important;
-  left: 17px !important;
+  left: 18px !important;
   display: block !important;
   box-sizing: border-box;
-  width: 3px !important;
-  height: 7px !important;
+  width: 4px !important;
+  height: 8px !important;
   margin: 0 !important;
   border: solid transparent !important;
   border-width: 0 2px 2px 0 !important;
@@ -380,7 +380,9 @@ export default {
   transform: rotate(45deg) !important;
   transform-origin: center !important;
 }
-.temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after { border-color: #fff !important; }
+.temporary-person-select-popper.el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after {
+  border-color: #fff !important;
+}
 
 .temporary-shift-time-popper.el-time-range-picker {
   width: 354px;

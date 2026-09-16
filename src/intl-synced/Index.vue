@@ -114,8 +114,8 @@
                   <td :colspan="displayDates.length + 1" class="schedule-empty-cell">
                     <div class="search-empty-state">
                       <div class="search-empty-illus" aria-hidden="true">
-                        <img class="search-empty-shadow" src="/assets/empty-state/empty-shadow.svg" alt="" width="50" height="16" />
-                        <img class="search-empty-doc" src="/assets/empty-state/empty-doc.svg" alt="" width="36" height="30" />
+                        <img class="search-empty-shadow" :src="assetUrl('empty-state/empty-shadow.svg')" alt="" width="50" height="16" />
+                        <img class="search-empty-doc" :src="assetUrl('empty-state/empty-doc.svg')" alt="" width="36" height="30" />
                       </div>
                       <p>暂无搜索结果</p>
                     </div>
@@ -231,6 +231,7 @@
 import ForecastMatrix from './components/ForecastMatrix.vue'
 import ScheduleOverview from './components/ScheduleOverview.vue'
 import { dates, forecastRows, shifts, scheduleRows } from './mock'
+import { assetUrl } from '../utils/assetUrl'
 
 export default {
   name: 'SmartSchedule',
@@ -249,13 +250,13 @@ export default {
       workflowSteps: [
         {
           title: '确认出勤工时/人数',
-          activeIcon: '/assets/figma-stepper/icon-form.svg',
-          pendingIcon: '/assets/figma-stepper/icon-document.svg',
+          activeIcon: assetUrl('figma-stepper/icon-form.svg'),
+          pendingIcon: assetUrl('figma-stepper/icon-document.svg'),
         },
         {
           title: '确认出勤班表',
-          activeIcon: '/assets/figma-stepper/icon-form.svg',
-          pendingIcon: '/assets/figma-stepper/icon-document.svg',
+          activeIcon: assetUrl('figma-stepper/icon-form.svg'),
+          pendingIcon: assetUrl('figma-stepper/icon-document.svg'),
         },
       ],
       department: 'nl-01',
@@ -341,6 +342,7 @@ export default {
     this.unlockBackgroundScroll()
   },
   methods: {
+    assetUrl,
     openOverview() {
       if (this.initialViewMode === 'wizard') {
         this.$emit('request-overview')
@@ -378,7 +380,7 @@ export default {
     },
     stepStateIcon(index) {
       const step = this.workflowSteps[index]
-      if (index < this.activeStep) return '/assets/figma-stepper/check.svg'
+      if (index < this.activeStep) return assetUrl('figma-stepper/check.svg')
       if (index === this.activeStep) return step.activeIcon
       return step.pendingIcon
     },
